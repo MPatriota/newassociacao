@@ -1,0 +1,479 @@
+  <div class="flex flex-column h-full">
+    <abertura-fechamento-caixa [(status)]="status"/>
+
+    <div class="layout-wrapper flex-1 min-h-0"
+         [style]="status?.isFechado ? 'pointer-events:none' : ''">
+      <!-- Left sidebar - Cart/Table details -->
+      <div class="col-3">
+        <p-card>
+          @if (isTableOpened) {
+            <div class="flex flex-column h-full">
+              <!-- Table header -->
+              <div class="mesa-header">
+                <div class="flex justify-content-between align-items-center">
+                  <span class="text-4xl font-bold">Mesa {{openedTable?.id}}</span>
+                </div>
+              </div>
+
+              <!-- Customer selection -->
+              <div class="mb-3">
+                <label class="block mb-2 font-medium">Cliente</label>
+                <p-autoComplete [(ngModel)]="openedTable!.cliente"
+                                styleClass="w-full"
+                                [suggestions]="clientes"
+                                (completeMethod)="findClientes($event.query)"
+                                optionLabel="nome"
+                                forceSelection
+                                formValidateMessage
+                                completeOnFocus
+                                showClear
+                                emptyMessage="Nenhum Cliente encontrado"
+                                placeholder="Buscar cliente"
+                                [inputStyle]="{'border-color': openedTable?.errorCliente ? 'red' : ''}"
+                                appendTo="body">
+                  <ng-template let-cliente pTemplate="item">
+                    <div class="flex align-items-center">
+                      <i class="pi pi-user mr-2"></i>
+                      <span>{{cliente.nome}}</span>
+                    </div>
+                  </ng-template>
+                </p-autoComplete>
+                <span *ngIf="openedTable?.errorCliente" style="color: red">Obrigatório informar um cliente</span>
+              </div>
+
+              <p-divider />
+
+              <!-- Cart items -->
+              <div class="items-container">
+                @if (openedTable?.items?.length) {
+                  <div class="flex flex-column gap-2">
+                    @for (item of openedTable?.items; track item) {
+                      <div class="cart-item">
+                        <p-button icon="pi pi-times"
+                                  [rounded]="true"
+                                  styleClass="remove-btn h-2rem w-2rem"
+                                  class="absolute right-0 top-0"
+                                  (onClick)="removeProduto(item.produto)"
+                                  severity="danger"/>
+
+                        <div class="font-medium mb-2">{{ item.produto.nome }}</div>
+                        <div class="flex gap-2 align-items-center">
+                          <div class="w-4">
+                            <p-inputNumber [min]="1"
+                                           [showButtons]="true"
+                                           buttonLayout="horizontal"
+                                           inputStyleClass="text-center"
+                                           decrementButtonClass="p-button-secondary"
+                                           incrementButtonClass="p-button-secondary"
+                                           incrementButtonIcon="pi pi-plus"
+                                           decrementButtonIcon="pi pi-minus"
+                                           [(ngModel)]="item.quantidade"/>
+                          </div>
+
+                          <div class="text-500">x</div>
+                          <div class="text-500">{{ item._valor | currencyFormat }}</div>
+                          <div class="ml-auto font-medium">{{ item.subtotal | currencyFormat }}</div>
+                        </div>
+                      </div>
+                    }
+                  </div>
+                } @else {
+                  <div class="empty-cart-message">
+                    <i class="pi pi-shopping-cart"></i>
+                    <div class="text-xl font-medium mb-2">Carrinho vazio</div>
+                    <div>Adicione produtos dando duplo clique nos itens</div>
+                  </div>
+                }
+              </div>
+
+              <!-- Total and action buttons -->
+              <div class="flex flex-column mt-auto">
+                <p-divider />
+
+                <div class="total-section">
+                  <div class="flex justify-content-between align-items-center">
+                    <div class="text-xl font-medium">Total</div>
+                    <div class="text-2xl font-bold">{{openedTable?.total | currencyFormat}}</div>
+                  </div>
+                </div>
+
+                <div class="flex flex-column gap-2">
+                  <div class="action-buttons flex justify-content-between gap-2">
+                    <div class="flex-1">
+                      <p-button
+                        label="Voltar"
+                        icon="pi pi-arrow-left"
+                        severity="danger"
+                        [style]="{width: '100%'}"
+                        (click)="collapseTable()"/>
+                    </div>
+
+                    <div class="flex-1">
+                      <p-button
+                        label="Finalizar Venda"
+                        icon="pi pi-check"
+                        [style]="{width: '100%'}"
+                        [disabled]="openedTable?.isEmpty"
+                        (onClick)="iniciarFinalizacaoVenda()"
+                        severity="success"/>
+                    </div>
+                  </div>
+                  <div class="flex">
+                    <div class="flex-1">
+                      <p-button
+                        label="Cancelar Venda"
+                        icon="pi pi-times"
+                        severity="danger"
+                        [style]="{width: '100%'}"
+                        [disabled]="openedTable?.isEmpty"
+                        (click)="cancelarVenda()"/>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          }
+        </p-card>
+      </div>
+
+      <!-- Main content area -->
+      <div class="col-9">
+        <p-card>
+          @if (isTableOpened) {
+            @if (finalizandoVenda){
+              <!-- Payment finalization view -->
+              <div class="col-12">
+                <div class="finalizar-header">
+                  <div class="flex justify-content-center">
+                    <p class="text-3xl font-bold mb-0">Finalizar Venda</p>
+                  </div>
+                </div>
+
+                <div class="flex flex-column gap-2 mb-2">
+                  <div class="flex gap-2 align-items-center">
+                    <label class="block mb-2 font-medium">Condições de Pagamento</label>
+                    <p-button icon="pi pi-plus"
+                              [rounded]="true"
+                              (click)="addCondicaoPagamento()"
+                              severity="success" />
+                  </div>
+                  <div class="flex flex-column gap-2">
+                    <div *ngFor="let condicaoVenda of openedTable?.condicoesPagamento;let isFirst = first"
+                         class="flex gap-2">
+                      <p-autoComplete [ngModel]="condicaoVenda.condicaoPagamento"
+                                      (ngModelChange)="changeCondicaoPagamento($event, condicaoVenda)"
+                                      styleClass="w-full"
+                                      [suggestions]="condicoesPagamento"
+                                      (completeMethod)="findCondicoesPagamento($event.query)"
+                                      optionLabel="nome"
+                                      forceSelection
+                                      formValidateMessage
+                                      completeOnFocus
+                                      showClear
+                                      emptyMessage="Nenhuma Condição de Pagamento encontrada"
+                                      placeholder="Selecionar forma de pagamento"
+                                      appendTo="body">
+                        <ng-template let-condicao pTemplate="item">
+                          <div class="flex align-items-center">
+                            <i class="pi pi-credit-card mr-2"></i>
+                            <span>{{condicao.nome}}</span>
+                          </div>
+                        </ng-template>
+                      </p-autoComplete>
+
+                      <div class="flex flex-column gap-1">
+                        <p-inputNumber inputId="valor"
+                                       [ngModel]="condicaoVenda.valor"
+                                       (ngModelChange)="changeCondicaoPagamentoValor($event, condicaoVenda)"
+                                       mode="currency"
+                                       [min]="0.01"
+                                       currency="BRL"/>
+                        <div *ngIf="!condicaoVenda.pristine && condicaoVenda.valor == 0" style="color: red;font-size: 0.8rem">O valor precisa ser maior que 0</div>
+                      </div>
+
+                      <p-button *ngIf="!isFirst"
+                                icon="pi pi-times"
+                                [rounded]="true"
+                                (click)="removeCondicaoPagamento(condicaoVenda)"
+                                severity="danger" />
+                    </div>
+                  </div>
+
+                </div>
+
+                <!-- Order summary -->
+                <p-panel header="Resumo da Venda" [toggleable]="true" styleClass="mb-4">
+                  <div class="grid">
+                    <div class="col-6">
+                      <div class="mb-3">
+                        <div class="text-500 mb-1">Cliente</div>
+                        <div class="font-medium">{{ openedTable?.cliente?.nome || 'Não informado' }}</div>
+                      </div>
+                      <div>
+                        <div class="text-500 mb-1">Mesa</div>
+                        <div class="font-medium">{{ openedTable?.id }}</div>
+                      </div>
+                    </div>
+                    <div class="col-6">
+                      <div class="mb-3">
+                        <div class="text-500 mb-1">Itens</div>
+                        <div class="font-medium">{{ openedTable?.items?.length }} produtos</div>
+                      </div>
+                      <div>
+                        <div class="text-500 mb-1">Total da Venda</div>
+                        <div class="font-medium text-xl">{{ openedTable?.total | currencyFormat }}</div>
+                      </div>
+                      <div style="color: #22C55E">
+                        <div class="text-500 mb-1">Total Pago</div>
+                        <div class="font-medium text-xl">{{ openedTable?.totalPago | currencyFormat }}</div>
+                      </div>
+                      <div style="color: #EF4444">
+                        <div class="text-500 mb-1">Valor Restante</div>
+                        <div class="font-medium text-xl">{{ openedTable?.valorRestante | currencyFormat }}</div>
+                      </div>
+                    </div>
+                    <div class="col-3">
+                      <div class="mb-3">
+                        <div class="text-500 mb-1">Contas a Receber</div>
+                      </div>
+                      <div class="flex justify-content-between" *ngFor="let contaReceber of openedTable?.contasReceber">
+                        <div>
+                          <b>Valor:</b> {{contaReceber.valor | currencyFormat}}
+                        </div>
+                        <div>
+                          <b>Data de Vencimento:</b> {{contaReceber.dataVencimento | dateFormat}}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </p-panel>
+              </div>
+
+              <div class="col-12">
+                <div class="flex gap-2">
+                  <div class="flex-1">
+                    <p-button
+                      label="Cancelar"
+                      icon="pi pi-times"
+                      severity="danger"
+                      [style]="{width: '100%'}"
+                      (click)="cancelarFinalizacaoVenda()"/>
+                  </div>
+
+                  <div class="flex-1">
+                    <p-button
+                      label="Confirmar Pagamento"
+                      icon="pi pi-check"
+                      [style]="{width: '100%'}"
+                      [disabled]="openedTable?.errorCliente || openedTable?.valorRestante != 0 || openedTable?.temCondicaoPagamentoZerada"
+                      (onClick)="finalizarVenda()"
+                      severity="success"/>
+                  </div>
+                </div>
+              </div>
+            } @else {
+              <!-- Products view -->
+              <div class="col-12">
+                <div class="flex justify-content-center mb-4">
+                  <p class="text-3xl font-bold">Produtos</p>
+                </div>
+                <div class="search-container">
+                  <span class="p-input-icon-left w-full">
+                    <input type="text"
+                           pInputText
+                           class="w-full"
+                           placeholder="Pesquisar produtos..."
+                           [(ngModel)]="produtoSearch"
+                           (input)="findProdutos()"/>
+                  </span>
+
+                  <div class="flex flex-wrap gap-2 mt-2">
+                    <div *ngFor="let tag of tags" [ngStyle]="{opacity: tag.selected ? '1' : '0.5'}">
+                      <tag-viewer [value]="tag.name"
+                                  [background]="tag.color"
+                                  (click)="filterByTag(tag)"
+                                  [interactive]="true"/>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+
+              <div class="grid">
+                @for (produto of produtos; track produto) {
+                  <div class="col-3 mb-3">
+                    <div class="product-card"
+                         (dblclick)="addProduto(produto)">
+                      <div class="product-image-container">
+                        <img [src]="produto.imagem || '/assets/images/product-placeholder.png'"
+                             alt="{{ produto.nome }}"
+                             class="product-image">
+                      </div>
+                      <div>
+                        <div class="text-xl font-medium mb-2">{{ produto.nome }}</div>
+                      </div>
+                      <div class="flex justify-content-between align-items-center">
+                        <span class="text-lg font-bold">{{ produto.valor | currencyFormat }}</span>
+                        <button pButton icon="pi pi-plus"
+                                class="p-button-rounded p-button-outlined"
+                                (click)="addProduto(produto)"></button>
+                      </div>
+                    </div>
+                  </div>
+                }
+              </div>
+            }
+
+          } @else {
+            <!-- Tables view -->
+            <div class="flex flex-column h-full py-1">
+              <h2 class="text-center text-3xl font-bold mb-4">Mesas Disponíveis</h2>
+
+              <p-toolbar styleClass="mb-4">
+                <div class="p-toolbar-group-start">
+                  <div class="flex align-items-center gap-3">
+                    <p-select-button [options]="tableStatusOptions" [(ngModel)]="selectedTableStatus"
+                                     optionLabel="label" optionValue="value"
+                                     (onChange)="filterTablesByStatus()">
+                      <ng-template let-option pTemplate="item">
+                        <div class="flex align-items-center px-2">
+                <span class="inline-block h-3 w-3 rounded-full mr-2"
+                      [ngClass]="option.value === 'available' ? 'bg-green-500' :
+                                  option.value === 'occupied' ? 'bg-red-500' : 'bg-gray-500'"></span>
+                          <span>{{option.label}}</span>
+                        </div>
+                      </ng-template>
+                    </p-select-button>
+                  </div>
+                </div>
+                <div class="p-toolbar-group-end">
+                  <span>Total: {{ filteredTables.length }} / {{ tables.length }} mesas</span>
+                </div>
+              </p-toolbar>
+
+              <div class="overflow-y-scroll flex-grow-1 py-2" style="scrollbar-width: none">
+                <div class="grid">
+                  @if (filteredTables.length > 0 || showAddTable) {
+                    @for (table of filteredTables; track table) {
+                      <div class="col-3 p-2">
+                        <div [ngClass]="['table-card', table.isDisponivel ? 'table-available' : 'table-occupied']"
+                             (dblclick)="openTable(table)">
+                          <div class="flex flex-column align-items-center gap-2">
+                            <span class="table-name">Mesa {{table.id}}</span>
+                            <span>{{table.cliente?.nome}}</span>
+                          </div>
+                          <span class="table-icon pi" [ngClass]="table.isDisponivel ? 'pi-unlock text-green-600' : 'pi-lock text-red-600'"></span>
+                          <button *ngIf="table.isLast && table.isDisponivel"
+                                  class="delete-table-btn p-button-danger p-button-sm"
+                                  pButton
+                                  icon="pi pi-trash"
+                                  (click)="deleteTable($event)"></button>
+                        </div>
+                      </div>
+
+                    }
+                    <div class="col-3 p-2" *ngIf="showAddTable">
+                      <div class="table-card table-add" (click)="createTable()">
+                        <span class="table-icon-add pi pi-plus"></span>
+                        <span class="table-name">Nova Mesa</span>
+                      </div>
+                    </div>
+                  } @else {
+                    <div class="col-12 p-4 text-center">
+                      <div class="text-xl text-500">
+                        <i class="pi pi-info-circle mr-2"></i>
+                        Nenhuma mesa encontrada com o filtro selecionado
+                      </div>
+                    </div>
+                  }
+                </div>
+              </div>
+            </div>
+          }
+        </p-card>
+      </div>
+    </div>
+  </div>
+
+  <p-toast position="bottom-right"/>
+  <p-confirmDialog />
+
+  <div #printSection [hidden]="true">
+    <div style="display: flex;flex-direction: column;gap: 30px">
+
+      <div style="display: flex;flex-direction: column;gap: 3px;align-items: center">
+        <h2 style="margin: 0;">{{associacao?.nomeFantasia}}</h2>
+        <div style="font-size: 0.8rem"><b>Endereço:</b> {{associacao?.endereco}}</div>
+        <div style="font-size: 0.8rem"><b>Telefone:</b> {{associacao?.telefone}}</div>
+      </div>
+
+      <div style="display: flex;gap: 5px;text-align: center">
+        <div style="flex: 1">{{vendaToPrint?.id}}</div>
+        <div>|</div>
+        <div style="flex: 1">{{vendaToPrint?.createdAt | dateFormat}}</div>
+        <div>|</div>
+        <div style="flex: 1">{{vendaToPrint?.createdAt | timeFormat}}</div>
+      </div>
+
+      <div>
+        <h2 style="text-align: center">Produtos</h2>
+        <table style="width: 100%">
+          <thead style="font-weight: bold">
+            <tr>
+              <td>
+                Cód
+              </td>
+              <td>
+                Desc
+              </td>
+              <td>
+                Qtde
+              </td>
+              <td>
+                V. Unit
+              </td>
+              <td>
+                V. Total
+              </td>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr *ngFor="let produto of vendaToPrint?.items">
+              <td>
+                {{produto.produto.id}}
+              </td>
+              <td>
+                {{produto.produto.nome}}
+              </td>
+              <td>
+                {{produto.quantidade}}
+              </td>
+              <td>
+                {{produto.valor | currencyFormat}}
+              </td>
+              <td>
+                {{produto.subtotal | currencyFormat}}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div>
+        <div><b>V. Total:</b> {{vendaToPrint?.total | currencyFormat}}</div>
+      </div>
+
+      <div style="display: flex; flex-direction: column;gap: 40px">
+        <div><b>Cliente:</b> {{vendaToPrint?.cliente?.nome}}</div>
+        <div style="display: flex;gap: 10px">
+          <div>Ass:</div>
+          <div style="border-width: 0 0 1px 0;
+                  border-color: black;
+                  width: 100%;
+                  border-style: solid"></div>
+        </div>
+      </div>
+    </div>
+
+  </div>

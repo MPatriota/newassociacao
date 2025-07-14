@@ -1,0 +1,22 @@
+@import "primeicons/primeicons.css";
+
+:root {
+  --module-color: #24c47d;
+}
+
+* {
+  font-family: 'Roboto', sans-serif;
+  font-size: 14px;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: rgba(239, 238, 238, 0.53);
+}
+
+.surround-text {
+  color: #9ca3af;
+  font-size: 0.85rem;
+}

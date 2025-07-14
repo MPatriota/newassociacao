@@ -1,0 +1,30 @@
+<div class="flex flex-column h-screen">
+  <div *ngIf="UsuarioContext.instance.isAuthenticated" class="navbar">
+    <p-menubar [model]="menuItems">
+      <ng-template pTemplate="end">
+        <div class="navbar-end">
+          <p-avatar
+            icon="pi pi-user"
+            shape="circle"
+            size="normal"
+            styleClass="p-overlay-badge"
+            (click)="visualizarPerfil()"
+            [style]="{'background-color': '#4CAF50', 'color': '#ffffff', cursor: 'pointer'}"
+            pTooltip="Perfil">
+          </p-avatar>
+        </div>
+      </ng-template>
+    </p-menubar>
+  </div>
+
+  <div class="flex-1 min-h-0">
+    <router-outlet/>
+  </div>
+
+</div>
+
+<p-toast position="bottom-right"/>
+
+<p-confirmDialog />
+
+<perfil [isVisibleChange]="formVisibleChange"/>

@@ -1,0 +1,91 @@
+<div class="p-1 flex justify-content-center"
+     [ngStyle]="{'background-color': status.isAberto ? '#22C55E' : '#EF4444'}"
+     style="cursor: pointer; color: white; font-weight: 500; padding: 0.5rem;"
+     (click)="openModal()">
+  Caixa {{status.descricao}}
+</div>
+
+<modal *ngIf="isModalOpened"
+       [title]="(status.isAberto ? 'Fechamento' : 'Abertura') + ' de Caixa'"
+       [(visible)]="isModalOpened"
+       (onHide)="closeModal()">
+  <p-card [style]="{width: '500px', maxWidth: '90vw'}">
+    @if (status.isFechado) {
+      <form [formGroup]="form">
+        <div class="flex flex-column p-3">
+          <div class="flex flex-column col-12 gap-2">
+            <label for="fundoTrocoInicial" style="font-weight: 500;">Fundo de Troco Inicial</label>
+            <p-inputNumber inputId="fundoTrocoInicial"
+                           mode="currency"
+                           [min]="0"
+                           currency="BRL"
+                           formControlName="saldoCaixa"
+                           styleClass="w-full"
+                           formValidateMessage/>
+          </div>
+        </div>
+      </form>
+    } @else {
+      <div class="p-3">
+        @for (razao of razoesFechamentoCaixa; track razao) {
+          <div class="mb-3">
+            <div class="flex flex-column">
+              <!-- Cabeçalho da seção -->
+              <div class="flex flex-row justify-content-between mb-2">
+                <span style="font-weight: 500;">{{razao.condicaoPagamento.nome}}</span>
+                <span style="font-weight: 500;">{{razao.valorRegistrado | currencyFormat}}</span>
+              </div>
+
+              <!-- Linha de abertura (apenas para Dinheiro) -->
+              @if (razao.condicaoPagamento.nome == 'Dinheiro') {
+                <div class="flex flex-row justify-content-between py-1">
+                  <span style="color: #666;">Abertura</span>
+                  <span>{{aberturaCaixa?.saldoCaixa | currencyFormat}}</span>
+                </div>
+              }
+
+              <!-- Linha de valor contado -->
+              <div class="flex flex-row justify-content-between align-items-center py-1">
+                <span style="color: #666;">Contado</span>
+                <p-inputNumber mode="currency"
+                               [min]="0"
+                               [(ngModel)]="razao.valorContado"
+                               currency="BRL"
+                               [inputStyle]="{'text-align': 'right'}"
+                               [style]="{width: '150px'}"/>
+              </div>
+
+              <!-- Linha de diferença -->
+              <div class="flex flex-row justify-content-between py-1">
+                <span style="color: #666;">Diferença</span>
+                @if (razao.condicaoPagamento.nome == 'Dinheiro') {
+                  <span [ngStyle]="{'color': (razao.valorRegistrado + aberturaCaixa!.saldoCaixa) - razao.valorContado !== 0 ? '#EF4444' : ''}">
+                    {{(razao.valorRegistrado + aberturaCaixa!.saldoCaixa) - razao.valorContado | currencyFormat}}
+                  </span>
+                } @else {
+                  <span [ngStyle]="{'color': razao.valorRegistrado - razao.valorContado !== 0 ? '#EF4444' : ''}">
+                    {{razao.valorRegistrado - razao.valorContado | currencyFormat}}
+                  </span>
+                }
+              </div>
+            </div>
+            <p-divider/>
+          </div>
+        }
+      </div>
+    }
+
+    <ng-template #footer>
+      <div class="flex flex-row gap-2 justify-content-end"
+           style="width: 100%">
+        <p-button label="Cancelar"
+                  severity="danger"
+                  (click)="closeModal()"/>
+        <p-button [label]="status.isAberto ? 'Fechar Caixa' : 'Abrir Caixa'"
+                  severity="success"
+                  [disabled]="form.invalid"
+                  (click)="changeStatus()"/>
+      </div>
+    </ng-template>
+  </p-card>
+</modal>

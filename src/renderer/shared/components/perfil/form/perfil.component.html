@@ -1,0 +1,36 @@
+<modal *ngIf="isVisible" title="Perfil" [(visible)]="isVisible" (onHide)="closeForm()">
+  <p-card [style]="{width: '50vw'}">
+    <div [formGroup]="form">
+      <div class="flex flex-column col-12 gap-3">
+        <div class="flex flex-row">
+          <div class="flex flex-column gap-2 col-12">
+            <label for="nome">Nome <span style="color: red">*</span></label>
+            <input pInputText id="nome" formControlName="nome" formValidateMessage maxlength="100"/>
+          </div>
+        </div>
+
+        <div class="flex flex-row">
+          <div class="flex flex-column gap-2 col-12">
+            <label for="usuario">Usuário <span style="color: red">*</span></label>
+            <input pInputText id="usuario" formControlName="usuario" formValidateMessage maxlength="255"/>
+          </div>
+        </div>
+      </div>
+
+      <p-divider/>
+
+      <p-button label="Redefinir Senha" severity="success" (click)="changeRedefinirSenha()"/>
+    </div>
+
+    <ng-template #footer>
+      <div class="flex flex-row gap-2 justify-content-end" style="width: 100%">
+        <p-button label="Cancelar" severity="danger" (click)="closeForm()"/>
+        <p-button label="Salvar" severity="success" [disabled]="form.invalid" (click)="save()"/>
+      </div>
+    </ng-template>
+  </p-card>
+</modal>
+
+<modal *ngIf="redefinirSenha" title="Redefinir Senha" [visible]="true" (onHide)="changeRedefinirSenha()">
+  <redefinir-senha-form  [senhaAtual]="form.get('senha')?.value" (onRedefinirSenha)="onRedefinirSenha()"/>
+</modal>

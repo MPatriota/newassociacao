@@ -1,0 +1,83 @@
+{
+  "appId": "com.association.club",
+  "productName": "Associação - Frente de Caixa",
+  "directories": {
+    "output": "release/frente-caixa"
+  },
+  "files": [
+    "dist/electron/**/*",
+    {
+      "from": "dist/",
+      "to": "dist/",
+      "filter": [
+        "${env.APP_TYPE}/**/*"
+      ]
+    },
+    {
+      "from": "src/main/template",
+      "to": "dist/electron/template",
+      "filter": [
+        "*.html"
+      ]
+    },
+    {
+      "from": "environment",
+      "to": "environment",
+      "filter": [
+        "*.dat"
+      ]
+    },
+    "package.json"
+  ],
+  "win": {
+    "requestedExecutionLevel": "requireAdministrator",
+    "target": [
+      {
+        "target": "nsis",
+        "arch": [
+          "x64"
+        ]
+      }
+    ],
+    "icon": "public/installer.ico",
+    "publisherName": "Associacao - Frente de Caixa"
+  },
+  "nsis": {
+    "oneClick": false,
+    "perMachine": true,
+    "warningsAsErrors": false,
+    "artifactName": "associacao-frente-caixa.${ext}",
+    "runAfterFinish": true,
+    "differentialPackage": true,
+    "displayLanguageSelector": true,
+    "unicode": true,
+    "allowElevation": true,
+    "allowToChangeInstallationDirectory": true,
+    "installerIcon": "public/installer.ico",
+    "uninstallerIcon": "public/installer.ico",
+    "installerHeaderIcon": "public/installer.ico",
+    "createDesktopShortcut": true,
+    "createStartMenuShortcut": true,
+    "shortcutName": "Associação - Frente de Caixa",
+    "include": "public/installer.nsh",
+    "menuCategory": true
+  },
+  "linux": {
+    "target": [
+      "AppImage",
+      "deb"
+    ],
+    "category": "Office",
+    "icon": "build/installer.png",
+    "executableName": "association-club-frente-caixa-executable-name",
+    "synopsis": "Aplicativo do Clube de Associados",
+    "maintainer": "Lucas V. Castanheiro <lucasvcastanheiro@gmail.com>",
+    "vendor": "Associação - Frente de Caixa",
+    "desktop": {
+      "Name": "Associação - Frente de Caixa",
+      "Comment": "Aplicativo do Clube de Associados",
+      "Categories": "Office;Finance;",
+      "Type": "Application"
+    }
+  }
+}

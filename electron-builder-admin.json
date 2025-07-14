@@ -1,0 +1,83 @@
+{
+  "appId": "com.association.club",
+  "productName": "Associação - Retaguarda",
+  "directories": {
+    "output": "release/retaguarda"
+  },
+  "files": [
+    "dist/electron/**/*",
+    {
+      "from": "dist/",
+      "to": "dist/",
+      "filter": [
+        "${env.APP_TYPE}/**/*"
+      ]
+    },
+    {
+      "from": "src/main/template",
+      "to": "dist/electron/template",
+      "filter": [
+        "*.html"
+      ]
+    },
+    {
+      "from": "environment",
+      "to": "environment",
+      "filter": [
+        "*.dat"
+      ]
+    },
+    "package.json"
+  ],
+  "win": {
+    "requestedExecutionLevel": "requireAdministrator",
+    "target": [
+      {
+        "target": "nsis",
+        "arch": [
+          "x64"
+        ]
+      }
+    ],
+    "icon": "public/installer.ico",
+    "publisherName": "Associacao - Retaguarda"
+  },
+  "nsis": {
+    "oneClick": false,
+    "perMachine": true,
+    "warningsAsErrors": false,
+    "artifactName": "associacao-retaguarda.${ext}",
+    "runAfterFinish": true,
+    "differentialPackage": true,
+    "displayLanguageSelector": true,
+    "unicode": true,
+    "allowElevation": true,
+    "allowToChangeInstallationDirectory": true,
+    "installerIcon": "public/installer.ico",
+    "uninstallerIcon": "public/installer.ico",
+    "installerHeaderIcon": "public/installer.ico",
+    "createDesktopShortcut": true,
+    "createStartMenuShortcut": true,
+    "shortcutName": "Associação - Retaguarda",
+    "include": "public/installer.nsh",
+    "menuCategory": true
+  },
+  "linux": {
+    "target": [
+      "AppImage",
+      "deb"
+    ],
+    "category": "Office",
+    "icon": "build/installer.png",
+    "executableName": "association-club-retaguarda",
+    "synopsis": "Aplicativo do Clube de Associados",
+    "maintainer": "Lucas V. Castanheiro <lucasvcastanheiro@gmail.com>",
+    "vendor": "Associação - Retaguarda",
+    "desktop": {
+      "Name": "Associação - Retaguarda",
+      "Comment": "Aplicativo do Clube de Associados",
+      "Categories": "Office;Finance;",
+      "Type": "Application"
+    }
+  }
+}

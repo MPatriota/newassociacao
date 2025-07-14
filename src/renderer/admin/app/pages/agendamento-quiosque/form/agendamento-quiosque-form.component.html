@@ -1,0 +1,193 @@
+<modal *ngIf="isVisible" title="Agendamento de Quiosque" [(visible)]="isVisible" (onHide)="closeForm()">
+  <p-card [style]="{width: '50vw'}">
+    <div [formGroup]="form" class="flex flex-column col-12 gap-3">
+      <p-stepper [(value)]="stepperActiveIndex">
+        <p-step-list>
+          <p-step [value]="1">Dados Gerais</p-step>
+          <p-step [value]="2">Contas A Receber</p-step>
+        </p-step-list>
+        <div [hidden]="stepperActiveIndex != 1">
+          <div class="flex flex-row">
+            <div class="flex flex-column col-6 gap-3">
+              <div class="flex flex-row">
+                <div class="flex flex-column gap-2 col-12">
+                  <label for="cliente">Cliente <span style="color: red">*</span></label>
+                  <p-autoComplete formControlName="cliente"
+                                  inputId="cliente"
+                                  id="cliente"
+                                  fluid
+                                  [suggestions]="clientesSelect"
+                                  (completeMethod)="searchClientes($event)"
+                                  [optionLabel]="clienteLabel"
+                                  forceSelection
+                                  formValidateMessage
+                                  completeOnFocus
+                                  showClear
+                                  emptyMessage="Nenhum Cliente encontrado"
+                                  appendTo="body"
+                  />
+                </div>
+              </div>
+              <div class="flex flex-row">
+                <div class="flex flex-column gap-2 col-12">
+                  <label for="quiosque">Quiosque <span style="color: red">*</span></label>
+                  <p-autoComplete formControlName="quiosque"
+                                  inputId="quiosque"
+                                  id="quiosque"
+                                  fluid
+                                  [suggestions]="quiosqueSelect"
+                                  (completeMethod)="searchQuiosques($event)"
+                                  [optionLabel]="quioqueLabel"
+                                  forceSelection
+                                  formValidateMessage
+                                  completeOnFocus
+                                  showClear
+                                  emptyMessage="Nenhum Quiosque encontrado"
+                                  appendTo="body"
+                  />
+                </div>
+              </div>
+              <div class="flex flex-row">
+                <div class="flex flex-column gap-2 col-4">
+                  <label for="data">Data <span style="color: red">*</span></label>
+                  <p-datePicker formControlName="data"
+                                inputId="data"
+                                formValidateMessage
+                                appendTo="body"
+                                showClear="true"
+                                dateFormat="dd/mm/yy"/>
+                </div>
+                <div class="flex flex-column gap-2 col-4">
+                  <label for="horaInicio">Hora Início <span style="color: red">*</span></label>
+                  <p-datePicker formControlName="horaInicio"
+                                inputId="horaInicio"
+                                formValidateMessage
+                                timeOnly="true"
+                                showClear="true"
+                                appendTo="body"/>
+                </div>
+                <div class="flex flex-column gap-2 col-4">
+                  <label for="horaFim">Hora Fim <span style="color: red">*</span></label>
+                  <p-datePicker formControlName="horaFim"
+                                inputId="horaFim"
+                                formValidateMessage
+                                timeOnly="true"
+                                showClear="true"
+                                appendTo="body"/>
+                </div>
+              </div>
+              <div class="flex flex-row">
+                <div class="flex flex-column gap-2 col-12">
+                  <label for="valor">Valor <span style="color: red">*</span></label>
+                  <p-inputNumber id="valor" inputId="valor" formControlName="valor" [min]="0.01" formValidateMessage mode="currency" currency="BRL"/>
+                </div>
+              </div>
+              <div class="flex flex-row">
+                <div class="flex flex-column gap-2 col-12">
+                  <label for="descricao">Descrição</label>
+                  <textarea id="descricao"
+                            rows="5" cols=""
+                            pTextarea
+                            formValidateMessage
+                            formControlName="descricao"
+                            style="resize: none"></textarea>
+                </div>
+              </div>
+            </div>
+            <div class="flex flex-column col-6 gap-3">
+              <div class="flex flex-row justify-content-center">
+                <p class="text-2xl">Agendamentos existentes</p>
+              </div>
+              <div class="flex flex-row justify-content-center flex-1">
+
+                @if (showAgendamentos) {
+
+                  <div class="w-full">
+                    <div *ngIf="agendamentoHasError" style="color: red;text-align: center">O horário escolhido conflita com algum agendamento existente</div>
+
+                    <p-table [value]="agendamentosByQuiosque" stripedRows class="w-full" [tableStyle]="{ 'width': '100%' }">
+                      <ng-template #header>
+                        <tr>
+                          <th>Hora Início</th>
+                          <th>Hora Fim</th>
+                        </tr>
+                      </ng-template>
+
+                      <ng-template #body let-product>
+                        <tr [ngStyle]="{color: product.error ? 'red' : ''}">
+                          <td>{{ product.horaInicio | timeFormat }}</td>
+                          <td>{{ product.horaFim | timeFormat}}</td>
+                        </tr>
+                      </ng-template>
+
+                      <ng-template #emptymessage>
+                        <tr>
+                          <td colspan="2">Nenhum agendamento encontrado para o quiosque na data selecionada</td>
+                        </tr>
+                      </ng-template>
+                    </p-table>
+                  </div>
+
+                } @else {
+                  <div class="align-self-center">
+                    <p class="text-center">Para visualizar os agendamentos, <br/> selecione um quiosque e uma data</p>
+                  </div>
+                }
+
+
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div [hidden]="stepperActiveIndex != 2">
+          <p-scrollPanel [style]="{ height: '30vh' }">
+            <crud-detail [formArray]="contasReceberFormArray"
+                         [createForm]="createContaReceberForm()"
+                         [children]="contasReceberChildren">
+
+              <crud-detail-column field="dataVencimento" header="Data Vencimento">
+                <ng-template #input let-contaReceber>
+                  <p-datePicker [ngModel]="contaReceber.dataVencimento | date:'dd/MM/yyyy'"
+                                (ngModelChange)="contaReceber.dataVencimento = $event"
+                                [ngModelOptions]="{standalone: true}"
+                                formValidateMessage
+                                appendTo="body"
+                                dateFormat="dd/mm/yy"/>
+                </ng-template>
+
+                <ng-template #output let-contaReceber>
+                  {{contaReceber.dataVencimento | dateFormat}}
+                </ng-template>
+              </crud-detail-column>
+
+              <crud-detail-column field="valor" header="Valor">
+                <ng-template #input let-contaReceber>
+                  <p-inputNumber [(ngModel)]="contaReceber.valor"
+                                 [ngModelOptions]="{standalone: true}"
+                                 [min]="0.01"
+                                 formValidateMessage
+                                 mode="currency"
+                                 currency="BRL"/>
+                </ng-template>
+
+                <ng-template #output let-contaReceber>
+                  {{contaReceber.valor | currencyFormat}}
+                </ng-template>
+              </crud-detail-column>
+
+            </crud-detail>
+          </p-scrollPanel>
+        </div>
+      </p-stepper>
+    </div>
+
+
+    <ng-template #footer>
+      <div class="flex flex-row gap-2 justify-content-end" style="width: 100%">
+        <p-button label="Cancelar" severity="danger" (click)="closeForm()"/>
+        <p-button label="Salvar" severity="success" [disabled]="form.invalid || agendamentoHasError" (click)="save()"/>
+      </div>
+    </ng-template>
+  </p-card>
+</modal>

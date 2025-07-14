@@ -1,0 +1,103 @@
+<div class="grid p-4">
+
+  <div class="col-12 mb-3">
+    <div class="flex justify-content-between align-items-center">
+      <div>
+        <h1 class="text-3xl font-bold text-900 mb-1">Bem-vindo, {{ usuario?.nome }}</h1>
+        <p class="text-700">{{ currentDate | date: 'fullDate' }}</p>
+      </div>
+      <button class="refresh-all-btn" title="Atualizar todos os dados" (click)="refreshAllData()">
+        <i class="pi pi-refresh mr-1"></i>
+        <span>Atualizar</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="col-12 md:col-6 xl:col-5ths p-2">
+    <div class="card-home card-iterative shadow-2 border-round card-sales">
+      <div class="card-header">
+        <i class="pi pi-dollar icon-sales"></i>
+        <span>Vendas no Mês</span>
+      </div>
+      <div class="card-value">
+        {{ stats.totalVenda | currencyFormat}}
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12 md:col-6 xl:col-5ths p-2">
+    <div class="card-home card-iterative shadow-2 border-round card-finances">
+      <div class="card-header">
+        <i class="pi pi-wallet icon-finances"></i>
+        <span>A Receber</span>
+      </div>
+      <div class="card-value">
+        {{ stats.totalContasAReceber | currencyFormat }}
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12 md:col-6 xl:col-5ths p-2">
+    <div class="card-home card-iterative shadow-2 border-round card-expenses">
+      <div class="card-header">
+        <i class="pi pi-money-bill icon-expenses"></i>
+        <span>A Pagar</span>
+      </div>
+      <div class="card-value">
+        {{ stats.totalContasPagar | currencyFormat }}
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12 xl:col-8 mt-3">
+    <div class="card-home shadow-2 border-round p-5 mb-4" style="height: 100%;">
+      <h2 class="text-xl font-bold mb-4">Quiosques alugados na semana</h2>
+
+      <div class="calendar-container" style="height: calc(100vh - 250px);">
+        <mwl-calendar-week-view
+          [viewDate]="currentDate"
+          [events]="events"
+          [locale]="'pt-BR'"
+          [dayStartHour]="0"
+          [dayEndHour]="24"
+          [hourSegments]="1"
+          [hourSegmentHeight]="30"
+        />
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12 xl:col-4 mt-3">
+    <div class="card-home shadow-2 border-round p-4" style="height: 100%">
+      <div class="flex justify-content-between align-items-center mb-4">
+        <h2 class="text-xl font-bold m-0">Atividades Recentes</h2>
+        <button class="action-btn refresh-btn p-2" title="Atualizar" (click)="refreshNotifications()">
+          <i class="pi pi-refresh"></i>
+        </button>
+      </div>
+
+      <div class="activities-container" style="height: calc(100vh - 250px); overflow-y: auto;">
+        <div *ngIf="recentActivities.length > 0" class="notification-list">
+          <div *ngFor="let activity of recentActivities; last as isLast"
+               class="notification-item">
+            <div class="notification-icon-wrapper" [ngClass]="getNotificationColorClass(activity)">
+              <i class="pi {{ activity.icon || 'pi-bell' }}"></i>
+            </div>
+            <div class="notification-content">
+              <div class="notification-title">{{ activity.title }}</div>
+              <div class="notification-message">{{ activity.description }}</div>
+              <div class="notification-time">{{ formatTime(activity.createdAt) }}</div>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="recentActivities.length === 0" class="empty-notifications">
+          <div class="empty-icon">
+            <i class="pi pi-bell"></i>
+          </div>
+          <p>Nenhuma atividade recente</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

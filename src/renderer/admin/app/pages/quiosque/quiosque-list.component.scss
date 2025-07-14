@@ -1,0 +1,371 @@
+.quiosque-container {
+  padding: 1.5rem;
+  background-color: #fff;
+}
+
+.quiosque-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  width: 100%;
+  margin: 0 auto;
+  padding-bottom: 4rem;
+}
+
+.quiosque-card {
+  display: flex;
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  transition: transform 0.2s, box-shadow 0.2s;
+  min-height: 280px;
+  width: 100%;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  }
+}
+
+.image-section {
+  width: 380px;
+  min-width: 380px;
+  position: relative;
+  overflow: hidden;
+
+  ::ng-deep {
+    .p-galleria {
+      height: 280px !important;
+      width: 100% !important;
+
+      .p-galleria-item-wrapper {
+        height: 280px !important;
+      }
+
+      .p-galleria-item {
+        height: 280px !important;
+
+        img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          object-position: center;
+        }
+      }
+
+      &-item-nav {
+        background: rgba(255,255,255,0.8) !important;
+        border-radius: 50%;
+        width: 2.5rem !important;
+        height: 2.5rem !important;
+        margin: 0 0.5rem;
+        color: #333;
+
+        &:hover {
+          background: white !important;
+        }
+      }
+
+      &-indicators {
+        .p-galleria-indicator button {
+          background-color: rgba(255,255,255,0.6);
+
+          &.p-highlight {
+            background-color: white;
+          }
+        }
+      }
+    }
+  }
+
+  .image-counter {
+    position: absolute;
+    bottom: 1rem;
+    left: 1rem;
+    background: rgba(0,0,0,0.7);
+    color: white;
+    padding: 0.4rem 0.8rem;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    z-index: 1;
+  }
+
+  .status-tag {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    background: #4caf50;
+    color: white;
+    padding: 0.4rem 0.8rem;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    z-index: 1;
+  }
+}
+
+.content-wrapper {
+
+  transition: all 0.3s ease;
+  padding-right: 25px;
+
+  &.sidebar-open {
+    padding-right: 500px;
+  }
+
+}
+
+.content-section {
+  flex: 1;
+  padding: 1rem 2rem;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+
+  .header {
+
+    h2 {
+      margin: 0.5rem 0;
+      color: #2c3e50;
+      font-size: 1.4rem;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .description {
+      color: #666;
+      font-size: 0.9rem;
+      margin: 0.5rem 0;
+      line-height: 1.4;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+  }
+
+  .amenities {
+    flex-grow: 1;
+    padding: 1rem 0;
+
+    .amenity-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .amenity-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      color: #555;
+      font-size: 0.95rem;
+
+      i {
+        color: #2196f3;
+        font-size: 1rem;
+      }
+    }
+  }
+
+  .pricing-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 1rem;
+    border-top: 1px solid #eee;
+    margin-top: auto;
+
+    .price {
+      display: flex;
+      flex-direction: column;
+
+      .label {
+        font-size: 0.9rem;
+        color: #666;
+      }
+
+      .value {
+        color: #2196f3;
+        font-size: 1.4rem;
+        font-weight: 600;
+      }
+    }
+
+    button {
+      min-width: 120px;
+    }
+  }
+}
+
+@media (max-width: 1024px) {
+  .quiosque-card {
+    height: auto;
+    flex-direction: column;
+  }
+
+  .image-section {
+    width: 100%;
+    min-width: 100%;
+    height: 280px;
+
+    ::ng-deep .p-galleria {
+      height: 280px !important;
+    }
+  }
+
+  .content-section {
+    padding: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .quiosque-container {
+    padding: 1rem;
+  }
+
+  .pricing-section {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: flex-start;
+
+    button {
+      width: 100%;
+    }
+  }
+}
+
+
+.paginator-container {
+  padding: 1rem;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+
+  ::ng-deep {
+    .p-paginator {
+      border: none;
+      padding: 0;
+      justify-content: center;
+
+      .p-paginator-current {
+        color: #6c757d;
+        font-weight: 500;
+      }
+
+      .p-paginator-page.p-highlight {
+        background: var(--module-color);
+        color: white;
+      }
+
+      .p-paginator-element {
+        &:focus {
+          box-shadow: none;
+          border-color: var(--module-color);
+        }
+
+        &:not(.p-highlight):hover {
+          background: #f8f9fa;
+        }
+      }
+
+      .p-dropdown {
+        height: 2.5rem;
+
+        .p-dropdown-label {
+          padding-right: 2.5rem;
+        }
+      }
+    }
+  }
+}
+
+.filter-container {
+  padding: 0 1.5rem 1.5rem;
+}
+
+.filter-section {
+  border-bottom: 1px solid var(--surface-200);
+}
+
+.filter-section h3 {
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-color);
+}
+.filter-actions {
+  position: sticky;
+  bottom: 0;
+  background: var(--surface-card);
+  padding: 1rem;
+  margin: 0 -1rem -1rem -1rem;
+  border-top: 1px solid var(--surface-200);
+}
+
+.surround-text {
+  color: #9ca3af;
+  font-size: 0.85rem;
+}
+
+.empty-quiosque-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  margin: 2rem 0;
+  text-align: center;
+  border: 1px dashed #dee2e6;
+}
+
+.empty-quiosque-state .empty-icon {
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #e9ecef;
+  border-radius: 50%;
+  margin-bottom: 1.5rem;
+}
+
+.empty-quiosque-state .empty-icon i {
+  font-size: 2rem;
+  color: var(--module-color, #2196f3);
+}
+
+.empty-quiosque-state h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #343a40;
+  margin-bottom: 0.5rem;
+}
+
+.empty-quiosque-state p {
+  color: #6c757d;
+  font-size: 1rem;
+  max-width: 400px;
+  margin-bottom: 2rem;
+}
+
+.empty-quiosque-state .empty-actions {
+  display: flex;
+  gap: 1rem;
+}
+
+@media (max-width: 576px) {
+  .empty-quiosque-state .empty-actions {
+    flex-direction: column;
+    width: 100%;
+    max-width: 250px;
+  }
+}

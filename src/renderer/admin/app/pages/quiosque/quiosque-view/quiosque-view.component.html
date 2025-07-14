@@ -1,0 +1,85 @@
+<div class="quiosque-detail-container">
+  <div class="quiosque-content"  *ngIf="quiosque">
+
+    <div class="content-area">
+      <div class="image-section">
+        <p-carousel [value]="quiosque.imagens" [numVisible]="1" [numScroll]="1" [circular]="true" [showIndicators]="true" [showNavigators]="true">
+          <ng-template let-imagem pTemplate="item">
+            <div class="carousel-item">
+              <img [src]="imagem.imagem" alt="Imagem do Quiosque">
+            </div>
+          </ng-template>
+        </p-carousel>
+      </div>
+
+      <div class="details-panel">
+
+        <div class="quiosque-header">
+          <h1>{{ quiosque.nome }}</h1>
+        </div>
+
+        <div class="quiosque-description" *ngIf="quiosque.descricao">
+          <h2>Descrição</h2>
+          <p>
+            {{ showFullDescription ? quiosque.descricao : (quiosque.descricao | slice:0:maxDescriptionLength) + (descriptionTruncated ? '...' : '') }}
+          </p>
+          <button *ngIf="descriptionTruncated" class="description-toggle" (click)="toggleDescription()">
+            {{ showFullDescription ? 'Mostrar menos' : 'Mostrar mais' }}
+          </button>
+        </div>
+
+        <div class="quiosque-features">
+          <div class="feature">
+            <div class="feature-icon">
+              <i class="pi pi-users"></i>
+            </div>
+            <div class="feature-detail">
+              <span class="feature-value">{{ quiosque.capacidadeMaxima }}</span>
+              <span class="feature-label">Capacidade máxima</span>
+            </div>
+          </div>
+
+          <div class="feature">
+            <div class="feature-icon">
+              <i class="pi pi-check-circle"></i>
+            </div>
+            <div class="feature-detail">
+              <span class="feature-value" [ngClass]="getStatusClass()">{{ getStatusLabel() }}</span>
+              <span class="feature-label">Status</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="utensilios-section">
+          <div class="utensilios-header" (click)="toggleUtensilios()">
+            <h2>Utensílios Disponíveis</h2>
+            <i class="pi" [ngClass]="utensiliosExpanded ? 'pi-chevron-up' : 'pi-chevron-down'"></i>
+          </div>
+
+          <div class="utensilios-content" [class.expanded]="utensiliosExpanded">
+            <div class="utensilio-item" *ngFor="let item of quiosque.utensilios">
+              <div class="utensilio-name">
+                <i class="pi pi-check"></i>
+                <span>{{ item.utensilio.nome }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="pricing-section">
+          <div class="pricing-header">
+            <h2>Valor do Aluguel</h2>
+          </div>
+          <div class="pricing-amount">
+            <span class="currency">R$</span>
+            <span class="value">{{ quiosque.valorAluguel | number:'1.2-2':'pt-BR' }}</span>
+          </div>
+          <div class="pricing-note">
+            <i class="pi pi-info-circle"></i>
+            <span>O valor pode variar conforme a data e duração do evento</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

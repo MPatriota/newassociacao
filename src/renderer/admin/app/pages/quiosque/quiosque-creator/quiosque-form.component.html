@@ -1,0 +1,256 @@
+<div class="quiosque-cadastro-container">
+  <div class="page-header">
+    <h1>Cadastro de Quiosque</h1>
+    <p class="subtitle">Preencha as informações para cadastrar um novo quiosque</p>
+  </div>
+
+  <form [formGroup]="quiosqueForm.form">
+    <p-card styleClass="form-card">
+      <ng-template pTemplate="header">
+        <div class="card-header">
+          <i class="pi pi-info-circle"></i>
+          <span>Informações Básicas</span>
+        </div>
+      </ng-template>
+
+      <div class="p-fluid p-formgrid p-grid">
+        <div class="flex gap-2">
+          <div class="flex flex-column col-11">
+            <label for="nome">
+              <i class="pi pi-building"></i>
+              Nome do Quiosque *
+            </label>
+            <span class="p-input-icon-right">
+              <input
+                id="nome"
+                type="text"
+                formValidateMessage
+                pInputText
+                formControlName="nome"
+                placeholder="Ex.: Quiosque Lago Norte"
+                [ngClass]="{'ng-invalid ng-dirty': submitted && formControls['nome'].errors}"
+                maxlength="50"
+              />
+            </span>
+          </div>
+
+          <div class="flex gap-2 col-1 align-items-center">
+            <p-checkbox formControlName="salao" inputId="salao" id="salao" [binary]="true"/>
+            <label class="m-0" for="salao">Salão</label>
+          </div>
+        </div>
+
+        <div class="p-field p-col-12 p-md-3">
+          <label for="capacidadeMaxima">
+            <i class="pi pi-users"></i>
+            Capacidade Máxima *
+          </label>
+          <span class="p-input-icon-right">
+            <p-inputNumber
+              id="capacidadeMaxima"
+              formControlName="capacidadeMaxima"
+              placeholder="Número de pessoas"
+              formValidateMessage
+              [min]="1"
+              [showButtons]="true"
+              [ngClass]="{'ng-invalid ng-dirty': submitted && formControls['capacidadeMaxima'].errors}"
+            ></p-inputNumber>
+          </span>
+        </div>
+
+        <div class="p-field p-col-12 p-md-3">
+          <label for="valorAluguel">
+            <i class="pi pi-money-bill"></i>
+            Valor do Aluguel (R$) *
+          </label>
+          <span class="p-input-icon-right">
+            <p-inputNumber
+              id="valorAluguel"
+              formControlName="valorAluguel"
+              formValidateMessage
+              placeholder="R$ 0,00"
+              mode="currency"
+              currency="BRL"
+              [minFractionDigits]="2"
+              [ngClass]="{'ng-invalid ng-dirty': submitted && formControls['valorAluguel'].errors}"
+            ></p-inputNumber>
+          </span>
+        </div>
+      </div>
+    </p-card>
+
+    <p-card styleClass="form-card">
+
+      <ng-template pTemplate="header">
+        <div class="card-header">
+          <i class="pi pi-list"></i>
+          <span>Utensílios Disponíveis</span>
+        </div>
+      </ng-template>
+
+      <div class="p-fluid">
+
+        <div class="utensilio-container">
+
+          <div class="utensilio-grid">
+
+            <div *ngFor="let utensilio of utensilios"
+                 class="utensilio-card"
+                 [class.selected]="utensilio['selecionado']"
+                 (click)="toggleUtensilio(utensilio)">
+
+              <div class="utensilio-content w-full justify-content-between">
+
+                <div class="w-4rem">
+                  <p-inputNumber [(ngModel)]="utensilio['quantidade']"
+                                 [ngModelOptions]="{standalone: true}"
+                                 [min]="utensilio['selecionado'] ? 1 : 0"
+                                 [disabled]="!utensilio['selecionado']"
+                                 [allowEmpty]="false"
+                                 (click)="$event.stopPropagation()"/>
+                </div>
+
+                <div class="flex gap-2">
+                  <span class="utensilio-nome">{{ utensilio.nome }}</span>
+
+                  <div class="checkbox-wrapper">
+                    <p-checkbox
+                      [binary]="true"
+                      [(ngModel)]="utensilio['selecionado']"
+                      [ngModelOptions]="{standalone: true}"
+                      (click)="$event.stopPropagation()"
+                    ></p-checkbox>
+                  </div>
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+
+          <div class="novo-utensilio-section">
+
+            <h3>Adicionar Novo Utensílio</h3>
+
+            <div class="p-inputgroup">
+
+              <input
+                type="text"
+                pInputText
+                [(ngModel)]="newUtensilioName"
+                [ngModelOptions]="{ standalone: true }"
+                placeholder="Digite o nome do utensílio"
+                (keyup.enter)="createUtensilio()"
+              />
+
+              <button
+                type="button"
+                pButton
+                style="margin-top: 10px"
+                icon="pi pi-plus"
+                label="Adicionar"
+                class="p-button-success"
+                (click)="createUtensilio()"
+                [disabled]="!newUtensilioName.trim()"
+              ></button>
+
+            </div>
+
+            <small class="hint-text">Clique em Adicionar para incluir um novo utensílio</small>
+
+          </div>
+
+        </div>
+      </div>
+    </p-card>
+
+    <p-card styleClass="form-card">
+      <ng-template pTemplate="header">
+        <div class="card-header">
+          <i class="pi pi-cog"></i>
+          <span>Configurações Adicionais</span>
+        </div>
+      </ng-template>
+
+      <div class="p-fluid p-formgrid p-grid">
+        <div class="p-field p-col-12 p-md-12">
+          <label for="observacoes">Descrição ou Observações</label>
+          <textarea
+            pTextarea
+            id="observacoes"
+            formValidateMessage
+            formControlName="descricao"
+            rows="10"
+            style="resize: none"
+            cols="129"
+            placeholder="Informe detalhes adicionais sobre o quiosque..."
+          ></textarea>
+        </div>
+
+        <div class="p-field p-col-12 p-md-6">
+          <div class="status-section">
+            <div class="status-header">
+              <i class="pi pi-power-off"></i>
+              <h3>Status do Quiosque</h3>
+            </div>
+
+            <div class="custom-toggle">
+              <p-inputSwitch
+                formControlName="status"
+                (onChange)="onStatusChange($event)">
+              </p-inputSwitch>
+
+              <span class="status-text" [ngClass]="quiosqueForm.form.get('status')?.value ? 'active' : 'inactive'">
+                {{ quiosqueForm.form.get('status')?.value ? 'Ativo' : 'Inativo' }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </p-card>
+
+    <p-card styleClass="form-card">
+      <ng-template pTemplate="header">
+        <div class="card-header">
+          <i class="pi pi-images"></i>
+          <span>Galeria de Imagens</span>
+        </div>
+      </ng-template>
+
+      <div class="p-fluid">
+        <image-upload-multiple #imageUploadMultipleComponent/>
+      </div>
+
+    </p-card>
+
+    <div class="actions-footer">
+
+      <button
+        type="button"
+        pButton
+        icon="pi pi-times"
+        label="Cancelar"
+        class="p-button-outlined p-button-secondary"
+        (click)="cancel()"
+      ></button>
+
+      <button
+        pButton
+        [loading]="submitted"
+        [disabled]="quiosqueForm.isInvalid"
+        (click)="save()"
+        icon="pi pi-save"
+        label="Salvar"
+        class="p-button-primary"
+      ></button>
+
+    </div>
+
+  </form>
+
+</div>
+
+<p-confirm-dialog/>
+<p-toast position="bottom-right"/>

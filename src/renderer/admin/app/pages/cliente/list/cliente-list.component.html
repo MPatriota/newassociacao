@@ -1,0 +1,77 @@
+<p-card>
+  <search-bar title="Clientes" (onNewClick)="clickNew()" (onSearch)="onSearch($event)"/>
+
+  <data-table [page]="page" (onPageChange)="loadData($event)">
+
+    <column field="foto" header="Foto">
+      <ng-template #body let-content>
+        @if (content.foto) {
+          <p-avatar [image]="content.foto" class="mr-2" size="large" shape="circle" />
+        } @else {
+          <p-avatar [label]="content.nome.charAt(0).toUpperCase()" class="mr-2" size="large" shape="circle" />
+        }
+      </ng-template>
+    </column>
+    <column field="nome" header="Nome"/>
+    <column field="matricula" header="Matrícula"/>
+
+    <column field="dependentes" header="Dependentes">
+      <ng-template #body let-content>
+        <p-tag icon="pi pi-users" severity="info" [value]="content.dependentes.length" [rounded]="true"
+               (click)="showDependentes(content, $event)" [style]="{cursor: 'pointer'}"/>
+      </ng-template>
+    </column>
+
+    <column [style]="{ 'width': '100px' }">
+
+      <ng-template #body let-content>
+
+        <div class="flex gap-2">
+
+          <button
+            pButton
+            (click)="edit(content)"
+            icon="pi pi-pencil"
+            class="p-button-text p-button-rounded">
+          </button>
+
+          <button
+            pButton
+            (click)="delete(content)"
+            icon="pi pi-trash"
+            class="p-button-text p-button-rounded p-button-danger">
+          </button>
+        </div>
+
+      </ng-template>
+
+    </column>
+
+  </data-table>
+  
+</p-card>
+
+<cliente-form [isVisibleChange]="formVisibleChange" (onSave)="onSave()"/>
+
+<p-confirmDialog />
+
+<p-popover #op [style]="{width: '15vw'}">
+  <div class="flex flex-column gap-2">
+    <h5>Dependentes</h5>
+    <p-scrollPanel [style]="{ height: '15vh' }">
+      <p-table [value]="dependentesToShow" stripedRows>
+        <ng-template #header>
+          <tr>
+            <th>Nome</th>
+          </tr>
+        </ng-template>
+        <ng-template #body let-product>
+          <tr>
+            <td>{{ product.nome }}</td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </p-scrollPanel>
+  </div>
+</p-popover>
+

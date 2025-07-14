@@ -1,0 +1,51 @@
+<p-card>
+  <search-bar title="Fornecedores" (onNewClick)="clickNew()" (onSearch)="onSearch($event)"/>
+
+  <data-table [page]="page" (onPageChange)="loadData($event)">
+
+    <column field="nome" header="Nome"/>
+    <column field="documento" header="Documento">
+      <ng-template #body let-content>
+        {{content.documento | documentoFormat}}
+      </ng-template>
+    </column>
+    <column field="responsavel" header="Responsável"/>
+    <column field="telefone" header="Telefone">
+      <ng-template #body let-content>
+        {{content.telefone | telefoneFormat}}
+      </ng-template>
+    </column>
+    <column field="email" header="E-mail"/>
+
+    <column [style]="{ 'width': '100px' }">
+
+      <ng-template #body let-content>
+
+        <div class="flex gap-2">
+
+          <button
+            pButton
+            (click)="edit(content)"
+            icon="pi pi-pencil"
+            class="p-button-text p-button-rounded">
+          </button>
+
+          <button
+            pButton
+            (click)="delete(content)"
+            icon="pi pi-trash"
+            class="p-button-text p-button-rounded p-button-danger">
+          </button>
+        </div>
+
+      </ng-template>
+
+    </column>
+
+  </data-table>
+  
+</p-card>
+
+<p-confirmDialog />
+
+<fornecedor-form [isVisibleChange]="formVisibleChange" (onSave)="onSave()"/>

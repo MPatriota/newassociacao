@@ -1,0 +1,38 @@
+<div class="gallery-container">
+
+  <div class="upload-area"
+       (dragover)="onDragOver($event)"
+       (dragleave)="onDragLeave($event)"
+       (drop)="onDrop($event)"
+       [class.drag-active]="isDragging">
+
+    <input
+      type="file"
+      #fileInput
+      multiple
+      accept="image/*"
+      (change)="onFileSelected($event)"
+      style="display: none">
+
+    <div class="upload-content" (click)="fileInput.click()">
+      <i class="pi pi-cloud-upload"></i>
+      <h3>Arraste suas imagens aqui</h3>
+      <p>ou clique para selecionar</p>
+      <span class="file-info">Aceita imagens JPG, PNG • Máximo 5MB por arquivo</span>
+    </div>
+  </div>
+
+  <div class="selected-images" *ngIf="imagesBase64.length > 0">
+
+    <div class="images-grid">
+      <div class="image-item" *ngFor="let file of imagesBase64; let i = index">
+        <div class="image-preview">
+          <img [src]="file">
+          <button class="delete-button" (click)="removeFile(i)">
+            <i class="pi pi-times"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

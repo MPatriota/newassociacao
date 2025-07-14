@@ -1,0 +1,48 @@
+<modal *ngIf="isVisible" title="Conta a Pagar" [(visible)]="isVisible" (onHide)="closeForm()">
+  <p-card [style]="{width: '50vw'}">
+    <div [formGroup]="form" class="flex flex-column col-12 gap-3">
+      <div class="flex flex-row">
+        <div class="flex flex-column gap-2 col-12">
+          <label for="fornecedor">Fornecedor <span style="color: red">*</span></label>
+          <p-autoComplete formControlName="fornecedor"
+                          inputId="fornecedor"
+                          id="fornecedor"
+                          fluid
+                          [suggestions]="fornecedoresSelect"
+                          (completeMethod)="searchFornecedores($event)"
+                          optionLabel="nome"
+                          forceSelection
+                          formValidateMessage
+                          completeOnFocus
+                          showClear
+                          emptyMessage="Nenhum Fornecedor encontrado"
+                          appendTo="body"
+          />
+        </div>
+      </div>
+      <div class="flex flex-row">
+        <div class="flex flex-column gap-2 col-12">
+          <label for="valor">Valor<span style="color: red">*</span></label>
+          <p-inputNumber id="valor" inputId="valor" formControlName="valor" [min]="0.01" formValidateMessage mode="currency" currency="BRL"/>
+        </div>
+      </div>
+      <div class="flex flex-row">
+        <div class="flex flex-column gap-2 col-12">
+          <label for="dataVencimento">Data Vencimento <span style="color: red">*</span></label>
+          <p-datePicker formControlName="dataVencimento"
+                        inputId="dataVencimento"
+                        formValidateMessage
+                        appendTo="body"
+                        dateFormat="dd/mm/yy"/>
+        </div>
+      </div>
+    </div>
+
+    <ng-template #footer>
+      <div class="flex flex-row gap-2 justify-content-end" style="width: 100%">
+        <p-button label="Cancelar" severity="danger" (click)="closeForm()"/>
+        <p-button label="Salvar" severity="success" [disabled]="form.invalid" (click)="save()"/>
+      </div>
+    </ng-template>
+  </p-card>
+</modal>

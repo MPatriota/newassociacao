@@ -1,0 +1,45 @@
+<p-card>
+
+  <search-bar [icon]="'pi pi-tag'" [title]="'Gerenciar Marcadores'" (onNewClick)="createVisible = true" (onSearch)="onSearch($event)"/>
+
+  <data-table [page]="page" (onPageChange)="loadData($event)">
+
+    <column [field]="'name'" [header]="'Marcador'">
+      <ng-template #body let-content>
+        <tag-viewer [value]="content.name" [background]="content.color"/>
+      </ng-template>
+    </column>
+
+    <column [style]="{ 'width': '100px' }">
+
+      <ng-template #body let-content>
+
+        <div class="flex gap-2">
+
+          <button
+            pButton
+            (click)="onEditTag(content)"
+            icon="pi pi-pencil"
+            class="p-button-text p-button-rounded">
+          </button>
+
+          <button
+            pButton
+            (click)="onDeleteTag(content)"
+            icon="pi pi-trash"
+            class="p-button-text p-button-rounded p-button-danger">
+          </button>
+        </div>
+
+      </ng-template>
+
+    </column>
+
+  </data-table>
+
+</p-card>
+
+<tag-dialog-creator [(visible)]="createVisible" [formTagValue]="formTag" (onChange)="formTag.reset(); fetch()"
+                    (visibleChange)="formTag.reset(); createVisible = false"/>
+
+<p-confirmdialog/>

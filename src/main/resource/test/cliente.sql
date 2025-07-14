@@ -1,0 +1,2 @@
+INSERT INTO endereco (id, cep, endereco, numero, bairro, cidade, estado) values (1, '87000000', 'rua teste', '69', 'bairro teste', 'maringa', 'pr');
+INSERT INTO cliente (id, nome, id_endereco, matricula, foto, limite_compra) values (1, 'Lucas Vinícius', 1, '123456', '', 153.44);

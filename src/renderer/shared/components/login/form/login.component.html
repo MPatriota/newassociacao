@@ -1,0 +1,39 @@
+<modal *ngIf="!redefinirSenha" title="Login" [visible]="true" [showClose]="false">
+  <p-card [style]="{width: '20vw'}" >
+    <div [formGroup]="form">
+      <div class="flex flex-column col-12 gap-3">
+
+        <p *ngIf="credenciaisInvalidas" class="text-center" style="color: red">Credenciais Inválidas</p>
+
+        <div class="flex flex-row">
+          <div class="flex flex-column gap-2 col-12">
+            <label for="usuario">Usuário</label>
+            <input pInputText
+                   id="usuario"
+                   formControlName="usuario"
+                   formValidateMessage
+                   maxlength="255"/>
+          </div>
+        </div>
+
+        <div class="flex flex-row">
+          <div class="flex flex-column gap-2 col-12">
+            <label for="nome">Senha</label>
+            <p-password formControlName="senha" [toggleMask]="true" [feedback]="false" styleClass="w-full" inputStyleClass="w-full"/>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <ng-template #footer>
+      <div class="flex flex-row gap-2 justify-content-end" style="width: 100%">
+        <p-button label="Entrar" severity="success" (click)="login()"/>
+      </div>
+    </ng-template>
+  </p-card>
+
+</modal>
+
+<modal *ngIf="redefinirSenha" title="Redefinir Senha" [visible]="true" [showClose]="false">
+  <redefinir-senha-form *ngIf="redefinirSenha" [senhaAtual]="form.get('senha')?.value" (onRedefinirSenha)="navigateToHome()"/>
+</modal>

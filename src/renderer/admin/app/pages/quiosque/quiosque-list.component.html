@@ -1,0 +1,259 @@
+<div [class.sidebar-open]="sidebar.sidebarOpen" class="content-wrapper">
+
+  <p-card>
+
+    <search-bar [icon]="'pi pi-shopping-cart'" [title]="'Gerenciar Quiosques'" (onNewClick)="goToNew()"
+                [showAdvancedFilters]="true" (onFilterClick)="sidebar.toggleSidebar()"/>
+
+    <div class="quiosque-container">
+      <div class="quiosque-list">
+        @for (quiosque of page?.content; track quiosque.id) {
+
+          <div class="quiosque-card">
+            <div class="image-section">
+              <p-galleria [value]="quiosque.imagens"
+                          [numVisible]="5"
+                          [circular]="true"
+                          [showItemNavigators]="true"
+                          [showThumbnails]="false"
+                          [containerStyle]="{'width': '100%', 'height': '100%'}"
+                          [showIndicators]="true">
+
+                <ng-template pTemplate="item" let-item>
+                  <img [src]="item.imagem"/>
+                </ng-template>
+              </p-galleria>
+
+              <div class="image-counter">
+                <i class="pi pi-camera"></i>
+                {{ quiosque.imagens.length }}
+              </div>
+
+              <div class="status-tag" *ngIf="quiosque.status">
+                <span>Disponível</span>
+              </div>
+            </div>
+
+            <div class="content-section">
+              <div class="header">
+                <h2>{{ quiosque.nome }}</h2>
+                <p class="description">{{ quiosque.descricao }}</p>
+              </div>
+
+              <div class="amenities">
+                <div class="amenity-group">
+                  <div class="amenity-item">
+                    <i class="pi pi-users"></i>
+                    <span>{{ quiosque.capacidadeMaxima }} pessoas</span>
+                  </div>
+
+                  <div class="amenity-item" *ngFor="let utensilio of quiosque.utensilios.slice(0, 3)">
+                    <i class="pi pi-check-circle"></i>
+                    <span>{{ utensilio.quantidade }} x {{ utensilio.utensilio.nome }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="pricing-section">
+                <div class="price">
+                  <span class="label">Aluguel</span>
+                  <span class="value">{{ quiosque.valorAluguel | currency: 'BRL' }}</span>
+                </div>
+
+                <div class="flex gap-2">
+                  <button pButton
+                          label="Ver detalhes"
+                          class="p-button-outlined"
+                          [routerLink]="quiosque.id + '/view'">
+                  </button>
+
+                  <button pButton
+                          label="Editar"
+                          class="p-button-outlined"
+                          routerLink="{{quiosque.id}}">
+                  </button>
+
+                  <button pButton
+                          label="Deletar"
+                          class="p-button-outlined"
+                          severity="danger"
+                          (click)="delete(quiosque)">
+                  </button>
+                </div>
+
+              </div>
+            </div>
+          </div>
+
+        } @empty {
+
+          <div class="empty-quiosque-state">
+            <div class="empty-icon">
+              <i class="pi pi-shopping-cart"></i>
+            </div>
+            <h3>Nenhum quiosque encontrado</h3>
+            <p>Não há quiosques disponíveis para exibição no momento.</p>
+            <div class="empty-actions">
+              <button pButton
+                      label="Adicionar Quiosque"
+                      icon="pi pi-plus"
+                      class="p-button-primary"
+                      (click)="goToNew()">
+              </button>
+              <button pButton
+                      label="Limpar Filtros"
+                      icon="pi pi-filter-slash"
+                      class="p-button-outlined p-button-secondary"
+                      (click)="clearFilters()">
+              </button>
+            </div>
+          </div>
+
+        }
+      </div>
+
+      <div class="paginator-container" *ngIf="(page?.content?.length ?? 0) > 0">
+        <p-paginator
+          [rows]="page?.size"
+          [totalRecords]="page?.totalElements"
+          (onPageChange)="onPageChange($event)"
+          [showCurrentPageReport]="true"
+          currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros"
+        ></p-paginator>
+      </div>
+    </div>
+  </p-card>
+
+</div>
+
+<sidebar [title]="'Filtros avançados'" #sidebar [icon]="'pi pi-filter'">
+  <div class="filter-container">
+
+    <p-divider [align]="'left'" type="solid">
+      Aluguel
+    </p-divider>
+
+    <div class="filter-section">
+      <div class="flex gap-2">
+        <span class="p-float-label">
+          <p-inputNumber
+            mode="currency"
+            currency="BRL"
+            locale="pt-BR"
+            [minFractionDigits]="2"
+            placeholder="Menor possível"
+            [maxFractionDigits]="2"
+            styleClass="w-full"
+            inputStyleClass="w-full">
+          </p-inputNumber>
+          <label class="surround-text">Valor mínimo</label>
+        </span>
+
+        <span class="p-float-label">
+          <p-inputNumber
+            mode="currency"
+            currency="BRL"
+            placeholder="Maior possível"
+            locale="pt-BR"
+            [minFractionDigits]="2"
+            [maxFractionDigits]="2"
+            styleClass="w-full"
+            inputStyleClass="w-full">
+          </p-inputNumber>
+          <label class="surround-text">Valor máximo</label>
+        </span>
+      </div>
+    </div>
+
+    <p-divider [align]="'left'" type="solid">
+      Capacidade
+    </p-divider>
+
+    <div class="filter-section">
+      <div class="flex gap-2">
+        <span class="p-float-label">
+          <p-inputNumber
+            [showButtons]="true"
+            placeholder="Menor possível"
+            [min]="0"
+            styleClass="w-full"
+            inputStyleClass="w-full">
+          </p-inputNumber>
+          <label class="surround-text">Capacidade mínima</label>
+        </span>
+
+        <span class="p-float-label">
+          <p-inputNumber
+            [showButtons]="true"
+            placeholder="Maior possível"
+            [min]="0"
+            styleClass="w-full"
+            inputStyleClass="w-full">
+          </p-inputNumber>
+          <label class="surround-text">Capacidade máxima</label>
+        </span>
+      </div>
+    </div>
+
+    <p-divider [align]="'left'" type="solid">
+      Status
+    </p-divider>
+
+    <div class="filter-section">
+      <p-selectButton
+        [options]="status"
+        [multiple]="true"
+        optionLabel="label"
+        optionValue="value">
+      </p-selectButton>
+    </div>
+
+    <p-divider [align]="'left'" type="solid">
+      Utensílios
+    </p-divider>
+
+    <div class="filter-section">
+
+      <p-autocomplete
+        emptyMessage="Nenhum utensilio encontrado"
+        multiple
+        [completeOnFocus]="true"
+        optionLabel="name"
+        placeholder="Seleciona um utensílio"
+        [dropdown]="true"
+        styleClass="w-full md:w-56">
+
+        <ng-template pTemplate="dropdownicon">
+          <fa-icon [icon]="faUtensils"></fa-icon>
+        </ng-template>
+
+        <ng-template pTemplate="header">
+          <div class="font-medium p-3">Utensílios disponíveis</div>
+        </ng-template>
+
+      </p-autocomplete>
+
+    </div>
+
+    <div class="filter-actions" style="margin-top: 1rem;">
+
+      <p-button
+        label="Limpar Filtros"
+        fluid
+        severity="secondary"
+        [style]="{ 'margin-bottom': '5px' }">
+      </p-button>
+
+      <p-button
+        label="Aplicar Filtros"
+        severity="success"
+        icon="pi pi-filter"
+        fluid>
+      </p-button>
+    </div>
+
+  </div>
+
+</sidebar>
+
+<p-confirmDialog />

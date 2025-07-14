@@ -1,0 +1,52 @@
+<modal *ngIf="isVisible" title="Saída de Estoque" [(visible)]="isVisible" (onHide)="closeForm()">
+  <p-card [style]="{width: '50vw'}">
+    <div [formGroup]="form">
+      <div class="flex flex-column col-12 gap-3">
+        <div class="flex flex-row">
+          <div class="flex flex-column gap-2 col-12">
+            <label for="produto">Produto <span style="color: red">*</span></label>
+            <p-autoComplete formControlName="produto"
+                            inputId="produto"
+                            id="produto"
+                            fluid
+                            [suggestions]="produtosSelect"
+                            (completeMethod)="searchProdutos($event)"
+                            [optionLabel]="produtoLabel"
+                            forceSelection
+                            formValidateMessage
+                            completeOnFocus
+                            showClear
+                            emptyMessage="Nenhum Produto encontrado"
+                            appendTo="body"
+            />
+          </div>
+        </div>
+        <div class="flex flex-row">
+          <div class="flex flex-column gap-2 col-12">
+            <label for="quantidade">Quantidade <span style="color: red">*</span></label>
+            <p-inputNumber id="quantidade" itemid="quantidade" formControlName="quantidade" [min]="1" formValidateMessage/>
+          </div>
+        </div>
+        <div class="flex flex-row">
+          <div class="flex flex-column gap-2 col-12">
+            <label for="requisitante">Requisitante <span style="color: red">*</span></label>
+            <input pInputText id="requisitante" formControlName="requisitante" formValidateMessage maxlength="100"/>
+          </div>
+        </div>
+        <div class="flex flex-row">
+          <div class="flex flex-column gap-2 col-12">
+            <label for="observacao">Observação</label>
+            <textarea id="observacao" rows="5" cols="" maxlength="500" pTextarea formValidateMessage formControlName="observacao" style="resize: none"></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <ng-template #footer>
+      <div class="flex flex-row gap-2 justify-content-end" style="width: 100%">
+        <p-button label="Cancelar" severity="danger" (click)="closeForm()"/>
+        <p-button label="Salvar" severity="success" [disabled]="form.invalid" (click)="save()"/>
+      </div>
+    </ng-template>
+  </p-card>
+</modal>

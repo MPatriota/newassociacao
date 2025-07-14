@@ -1,0 +1,58 @@
+<p-card>
+  <search-bar title="Condições de Pagamento" (onNewClick)="clickNew()" (onSearch)="onSearch($event)"/>
+
+  <data-table [page]="page" (onPageChange)="loadData($event)">
+
+    <column field="nome" header="Nome"/>
+    <column field="parcelas" header="Parcelas"/>
+    <column field="intervalo" header="Intervalo"/>
+    <column field="ativa" header="Status">
+      <ng-template #body let-content>
+        {{content.ativa ? 'Ativa' : 'Inativa'}}
+      </ng-template>
+    </column>
+
+    <column field="obrigadoInformarCliente" header="Obrigado Informar Cliente">
+      <ng-template #body let-content>
+        {{content.obrigadoInformarCliente ? 'Sim' : 'Não'}}
+      </ng-template>
+    </column>
+
+    <column field="aVista" header="À Vista">
+      <ng-template #body let-content>
+        {{content.aVista ? 'Sim' : 'Não'}}
+      </ng-template>
+    </column>
+
+    <column [style]="{ 'width': '100px' }">
+
+      <ng-template #body let-content>
+
+        <div class="flex gap-2">
+
+          <button
+            pButton
+            (click)="edit(content)"
+            icon="pi pi-pencil"
+            class="p-button-text p-button-rounded">
+          </button>
+
+          <button
+            pButton
+            (click)="delete(content)"
+            icon="pi pi-trash"
+            class="p-button-text p-button-rounded p-button-danger">
+          </button>
+        </div>
+
+      </ng-template>
+
+    </column>
+
+  </data-table>
+
+</p-card>
+
+<p-confirmDialog />
+
+<condicao-pagamento-form [isVisibleChange]="formVisibleChange" (onSave)="onSave()"/>

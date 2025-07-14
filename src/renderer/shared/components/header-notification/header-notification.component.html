@@ -1,0 +1,59 @@
+<div class="notification-container" #notificationContainer>
+  <button class="notification-btn" (click)="toggleNotifications($event)" [class.has-notifications]="notificationCount > 0">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="notification-icon">
+      <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2zm-2 1H8v-6c0-2.48 1.51-4.5 4-4.5s4 2.02 4 4.5v6z"/>
+    </svg>
+    <span class="notification-badge" *ngIf="notificationCount > 0">{{ notificationCount }}</span>
+  </button>
+
+  <div class="notification-dropdown" *ngIf="popoverVisible" [@slideDown]>
+    <div class="notification-header">
+      <h3>Notificações</h3>
+      <div class="notification-actions">
+        <button class="action-btn refresh-btn" title="Atualizar" (click)="notificationService.clearCache(); loadNotifications()">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/>
+          </svg>
+        </button>
+        <button class="action-btn close-btn" (click)="closeNotifications()">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+
+    <div class="notification-list-wrapper">
+      <div class="notification-list" *ngIf="notifications.length > 0">
+        <div class="notification-item" *ngFor="let notification of notifications; trackBy: trackByFn"
+             [class.unread]="!notification.read"
+             (click)="execute(notification)">
+          <div class="notification-icon-wrapper">
+            <i class="pi {{ notification.icon || 'pi-bell' }}"></i>
+          </div>
+          <div class="notification-content">
+            <div class="notification-title">{{ notification.title }}</div>
+            <div class="notification-message" [innerHTML]="notification.description"></div>
+            <div class="notification-time">{{ formatTime(notification.createdAt) }}</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="empty-notifications" *ngIf="notifications.length === 0">
+        <div class="empty-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2zm-2 1H8v-6c0-2.48 1.51-4.5 4-4.5s4 2.02 4 4.5v6z"/>
+          </svg>
+        </div>
+        <p>Nenhuma notificação no momento</p>
+      </div>
+    </div>
+
+    <div class="notification-footer" *ngIf="hasUnreadNotifications()">
+      <button class="mark-all-btn" (click)="markAllAsRead()">
+        Marcar tudo como lido
+      </button>
+    </div>
+  </div>
+</div>

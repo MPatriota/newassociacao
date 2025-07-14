@@ -1,0 +1,474 @@
+$primary-color: #00c89b;
+$secondary-color: #4c4cff;
+$text-dark: #333;
+$text-medium: #666;
+$text-light: #999;
+$border-color: #e0e0e0;
+$bg-light: #f9f9f9;
+$white: #fff;
+$available-color: #4caf50;
+$unavailable-color: #f44336;
+
+.quiosque-detail-container {
+  font-family: 'Roboto', Arial, sans-serif;
+  height: 90vh;
+  width: 100%;
+  background-color: #f5f5f5;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.quiosque-content {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background-color: $white;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  max-width: 100%;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.quiosque-tabs {
+  display: flex;
+  border-bottom: 1px solid $border-color;
+  background-color: $white;
+
+  .tab {
+    padding: 12px 24px;
+    cursor: pointer;
+    font-weight: 500;
+    color: $text-medium;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s ease;
+
+    &.active {
+      color: $primary-color;
+      border-bottom: 2px solid $primary-color;
+    }
+
+    &:hover:not(.active) {
+      color: $text-dark;
+      background-color: rgba(0, 0, 0, 0.03);
+    }
+  }
+}
+
+.content-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+
+  @media (min-width: 992px) {
+    flex-direction: row;
+  }
+}
+
+.image-section {
+  position: relative;
+  height: 300px;
+  background-color: #f0f0f0;
+  max-height: 40vh;
+
+  @media (min-width: 992px) {
+    width: 50%;
+    height: auto;
+    max-height: 100vh;
+  }
+
+  .carousel-item {
+    height: 300px;
+    max-height: 40vh;
+
+    @media (min-width: 992px) {
+      height: 100%;
+      max-height: 100vh;
+    }
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+}
+
+.map-section {
+  height: 300px;
+  max-height: 40vh;
+  background-color: #f0f0f0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: $text-medium;
+
+  @media (min-width: 992px) {
+    width: 50%;
+    height: auto;
+    max-height: 100vh;
+  }
+
+  .map-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    i {
+      font-size: 32px;
+      margin-bottom: 12px;
+    }
+  }
+}
+
+.details-panel {
+  padding: 16px;
+  flex: 1;
+  overflow-y: auto;
+  height: 100%;
+
+  @media (min-width: 992px) {
+    width: 50%;
+    padding: 20px;
+    max-height: calc(100vh - 40px);
+  }
+
+  .quiosque-header {
+    margin-bottom: 16px;
+
+    h1 {
+      margin: 0 0 8px 0;
+      color: $text-dark;
+      font-size: 22px;
+      font-weight: 600;
+    }
+
+    .quiosque-location {
+      display: flex;
+      align-items: center;
+      color: $text-medium;
+
+      i {
+        margin-right: 6px;
+        color: $text-light;
+      }
+    }
+  }
+
+  .quiosque-description {
+    margin-bottom: 16px;
+
+    h2 {
+      font-size: 16px;
+      color: $text-dark;
+      margin-bottom: 8px;
+    }
+
+    p {
+      margin: 0;
+      line-height: 1.5;
+      color: $text-medium;
+    }
+
+    .description-toggle {
+      background: none;
+      border: none;
+      color: $primary-color;
+      padding: 5px 0;
+      margin-top: 8px;
+      cursor: pointer;
+      font-weight: 500;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+
+  .quiosque-features {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 16px;
+
+    .feature {
+      display: flex;
+      align-items: center;
+      flex: 1;
+
+      .feature-icon {
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        background-color: #f0f0f0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 10px;
+
+        i {
+          color: $text-medium;
+          font-size: 20px;
+        }
+      }
+
+      .feature-detail {
+        display: flex;
+        flex-direction: column;
+
+        .feature-value {
+          font-weight: 600;
+          font-size: 18px;
+          color: $text-dark;
+
+          &.status-available {
+            color: $available-color;
+          }
+
+          &.status-unavailable {
+            color: $unavailable-color;
+          }
+        }
+
+        .feature-label {
+          font-size: 14px;
+          color: $text-medium;
+        }
+      }
+    }
+  }
+
+  .utensilios-section {
+    margin-bottom: 16px;
+    border: 1px solid $border-color;
+    border-radius: 6px;
+    overflow: hidden;
+
+    .utensilios-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 16px;
+      background-color: $bg-light;
+      cursor: pointer;
+
+      h2 {
+        margin: 0;
+        font-size: 16px;
+        color: $text-dark;
+      }
+
+      i {
+        color: $text-medium;
+        transition: transform 0.3s ease;
+      }
+    }
+
+    .utensilios-content {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+
+      &.expanded {
+        max-height: 300px;
+        overflow-y: auto;
+      }
+
+      .utensilio-item {
+        padding: 12px 16px;
+        border-bottom: 1px solid $border-color;
+
+        &:last-child {
+          border-bottom: none;
+        }
+
+        .utensilio-name {
+          display: flex;
+          align-items: center;
+          margin-bottom: 6px;
+
+          i {
+            color: $primary-color;
+            margin-right: 10px;
+          }
+
+          span {
+            color: $text-dark;
+            font-weight: 500;
+          }
+        }
+
+        .utensilio-description {
+          margin-left: 24px;
+          color: $text-medium;
+          font-size: 14px;
+        }
+      }
+    }
+  }
+
+  .pricing-section {
+    margin-bottom: 16px;
+    background-color: $bg-light;
+    border-radius: 8px;
+    padding: 12px;
+
+    .pricing-header {
+      h2 {
+        margin: 0 0 10px 0;
+        font-size: 18px;
+        color: $text-dark;
+      }
+    }
+
+    .pricing-amount {
+      margin-bottom: 8px;
+      display: flex;
+      align-items: baseline;
+
+      .currency {
+        font-size: 16px;
+        font-weight: 600;
+        color: $text-dark;
+        margin-right: 4px;
+      }
+
+      .value {
+        font-size: 24px;
+        font-weight: 700;
+        color: $text-dark;
+      }
+    }
+
+    .pricing-note {
+      display: flex;
+      align-items: center;
+      color: $text-light;
+      font-size: 14px;
+
+      i {
+        margin-right: 6px;
+      }
+    }
+  }
+
+  .action-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 16px;
+
+    @media (min-width: 768px) {
+      flex-direction: row;
+      flex-wrap: wrap;
+
+      .btn {
+        flex: 1 1 calc(50% - 5px);
+      }
+
+      .primary {
+        flex: 1 1 100%;
+      }
+    }
+
+    .btn {
+      padding: 12px;
+      border-radius: 4px;
+      border: none;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      i {
+        margin-right: 8px;
+      }
+
+      &.primary {
+        background-color: $primary-color;
+        color: $white;
+      }
+
+      &.secondary {
+        background-color: $white;
+        color: $text-dark;
+        border: 1px solid $border-color;
+
+        &:hover {
+          background-color: $bg-light;
+        }
+      }
+    }
+  }
+
+  .quiosque-footer {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+
+    .updated-info {
+      color: $text-light;
+      display: flex;
+      align-items: center;
+
+      i {
+        margin-right: 4px;
+      }
+    }
+  }
+}
+
+:host ::ng-deep {
+  .p-carousel {
+    .p-carousel-indicators {
+      bottom: 0;
+      background-color: rgba(0, 0, 0, 0.3);
+      padding: 4px;
+      margin: 0;
+      position: absolute;
+      width: 100%;
+      justify-content: center;
+
+      .p-carousel-indicator button {
+        width: 8px;
+        height: 8px;
+        margin: 0 3px;
+        background-color: rgba(255, 255, 255, 0.4);
+
+        &.p-highlight {
+          background-color: $white;
+        }
+      }
+    }
+
+    .p-carousel-prev,
+    .p-carousel-next {
+      background-color: rgba(255, 255, 255, 0.7);
+      border-radius: 50%;
+      width: 32px;
+      height: 32px;
+      visibility: hidden;
+      opacity: 0;
+      transition: opacity 0.3s ease, visibility 0.3s ease;
+      margin: 0 4px;
+
+      span {
+        color: $text-dark;
+        font-size: 14px;
+      }
+    }
+
+    &:hover {
+      .p-carousel-prev,
+      .p-carousel-next {
+        visibility: visible;
+        opacity: 1;
+      }
+    }
+  }
+}

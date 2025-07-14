@@ -1,0 +1,64 @@
+<p-table
+  dataKey="id"
+  [value]="page?.content ?? []"
+  [lazy]="true"
+  [paginator]="true"
+  [rows]="pageParameters.limit"
+  [showCurrentPageReport]="true"
+  (onPage)="loadData($event)"
+  [totalRecords]="page?.totalElements ?? 0"
+  currentPageReportTemplate="Mostrando {first} até {last} de {totalRecords}"
+  [rowsPerPageOptions]="[10,25,50]"
+  styleClass="p-datatable-gridlines">
+
+  <ng-template pTemplate="header">
+    <tr>
+
+      @for (column of columns; track column.field) {
+        <th [style]="column.style">
+          {{ column.header }}
+        </th>
+      }
+
+    </tr>
+  </ng-template>
+
+  <ng-template pTemplate="body" let-content>
+    <tr>
+
+      @for (column of columns; track column.field) {
+
+        <td [style]="column.style">
+
+          @if (column.bodyTemplate) {
+
+            <ng-container
+              [ngTemplateOutlet]="column.bodyTemplate"
+              [ngTemplateOutletContext]="{ $implicit: content, data: content }">
+            </ng-container>
+
+          } @else {
+
+            {{ column.field ? content[column.field] : '' }}
+
+          }
+
+        </td>
+
+      }
+
+    </tr>
+  </ng-template>
+
+  <ng-template pTemplate="emptymessage">
+    <tr>
+      <td
+        [attr.colspan]="columnsLength"
+        class="text-center"
+      >
+        Nenhum registro encontrado
+      </td>
+    </tr>
+  </ng-template>
+
+</p-table>

@@ -1,0 +1,56 @@
+<div class="layout-wrapper">
+  <div *ngIf="UsuarioContext.instance.isAuthenticated" class="navbar">
+    <p-menubar [model]="menuItems">
+
+      <ng-template pTemplate="end">
+        <div class="navbar-end">
+          <p-button
+            icon="pi pi-question-circle"
+            styleClass="p-button-text p-button-rounded navbar-button"
+            pBadge value="2"
+            (onClick)="ajudaVisible = !ajudaVisible"
+            pTooltip="Ajuda">
+          </p-button>
+
+          <app-notification/>
+
+          <p-avatar
+            icon="pi pi-user"
+            shape="circle"
+            size="normal"
+            styleClass="p-overlay-badge"
+            (click)="visualizarPerfil()"
+            [style]="{'background-color': '#4CAF50', 'color': '#ffffff', cursor: 'pointer'}"
+            pTooltip="Perfil">
+          </p-avatar>
+        </div>
+      </ng-template>
+    </p-menubar>
+  </div>
+
+  <div class="main-content">
+    <router-outlet/>
+  </div>
+
+</div>
+
+<p-toast position="bottom-right"/>
+
+<p-confirmDialog />
+
+<perfil [isVisibleChange]="formVisibleChange"/>
+
+<modal title="Ajuda" [(visible)]="ajudaVisible" (onHide)="ajudaVisible = !ajudaVisible">
+  <div class="flex flex-column gap-3 p-5">
+    <div>
+      <h3>Telefones</h3>
+      <p>(44) 99906-6433</p>
+      <p>(44) 99766-6433</p>
+    </div>
+    <div>
+      <h3>Email</h3>
+      <p>{{email}}</p>
+    </div>
+  </div>
+</modal>
+

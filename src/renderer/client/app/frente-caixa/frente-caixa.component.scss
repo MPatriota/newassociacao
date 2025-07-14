@@ -1,0 +1,334 @@
+/* frente-caixa.component.scss */
+:host ::ng-deep {
+  user-select: none;
+
+  .layout-wrapper {
+    display: flex;
+    background-color: #f8f9fa;
+    padding: 1rem;
+  }
+
+  .p-card {
+    height: 100%;
+    border-radius: 10px;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.05);
+
+    .p-card-body, .p-card-content {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+  }
+
+  .table-card {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 110px;
+    border: 2px solid;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+
+    &:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    &:active {
+      transform: translateY(1px);
+    }
+
+    .table-icon {
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      font-size: 1.2rem;
+      opacity: 0.7;
+    }
+  }
+
+  .table-name {
+    font-size: 1.3rem;
+    font-weight: 600;
+  }
+
+  .table-available {
+    border-color: #22C55E;
+    background-color: #ECFDF5;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 8px;
+      height: 100%;
+      background-color: #22C55E;
+    }
+  }
+
+  .table-occupied {
+    border-color: #EF4444;
+    background-color: #FEF2F2;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 8px;
+      height: 100%;
+      background-color: #EF4444;
+    }
+  }
+
+  .table-reserved {
+    border-color: #F97316;
+    background-color: #FFF7ED;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 8px;
+      height: 100%;
+      background-color: #F97316;
+    }
+  }
+
+  .selected-table {
+    box-shadow: 0 0 0 3px #3B82F6;
+  }
+
+  .mesa-header {
+    background: linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%);
+    color: white;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+  }
+
+  .product-item {
+    transition: all 0.2s ease;
+    border-radius: 8px;
+    background-color: white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    height: 100%;
+
+    &:hover {
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+      transform: translateY(-2px);
+    }
+  }
+
+  .product-card {
+    border-radius: 8px;
+    cursor: pointer;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 1.5rem;
+    background: linear-gradient(145deg, #ffffff, #f0f0f0);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+
+    &:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    &:active {
+      transform: translateY(1px);
+    }
+  }
+
+  .cart-item {
+    background-color: white;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 0.5rem;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    position: relative;
+    transition: all 0.2s ease;
+
+    &:hover {
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    .remove-btn {
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+
+    &:hover .remove-btn {
+      opacity: 1;
+    }
+  }
+
+  .search-container {
+    margin-bottom: 1.5rem;
+    position: relative;
+
+    .p-input-icon-left {
+      width: 100%;
+    }
+
+    i {
+      color: #6b7280;
+    }
+  }
+
+  .total-section {
+    background-color: #f9fafb;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-top: auto;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.03);
+  }
+
+  .action-buttons {
+    margin-top: 1rem;
+  }
+
+  .p-button {
+    border-radius: 8px;
+
+    &.p-button-success {
+      background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+    }
+
+    &.p-button-danger {
+      background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
+      box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
+    }
+  }
+
+  .empty-cart-message {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: #9ca3af;
+    text-align: center;
+    padding: 2rem;
+
+    i {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+  }
+
+  .p-divider {
+    margin: 1rem 0;
+  }
+
+  .p-inputtext, .p-autocomplete-input {
+    width: 100%;
+    border-radius: 8px;
+  }
+
+  .items-container {
+    overflow-y: auto;
+    flex-grow: 1;
+    padding-right: 0.5rem;
+
+    &::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 10px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: #c1c1c1;
+      border-radius: 10px;
+    }
+  }
+
+  .finalizar-header {
+    background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+    color: white;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+  }
+}
+
+.product-image-container {
+  height: 140px;
+  overflow: hidden;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f8f8f8;
+}
+
+.product-image {
+  width: 100%;
+  height: 100%;
+  transition: transform 0.3s ease;
+}
+
+.product-card:hover .product-image {
+  transform: scale(1.05);
+}
+
+.table-add {
+  border-color: #6366F1;
+  background-color: #EEF2FF;
+  border-style: dashed;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 8px;
+    height: 100%;
+    background-color: #6366F1;
+  }
+
+  &:hover {
+    background-color: #E0E7FF;
+  }
+
+  .table-icon-add {
+    font-size: 1.8rem;
+    color: #6366F1;
+  }
+}
+
+.delete-table-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+
+  .pi {
+    font-size: 0.875rem;
+  }
+}
+
+.table-card:hover .delete-table-btn {
+  opacity: 1;
+}

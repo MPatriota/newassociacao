@@ -1,0 +1,147 @@
+<modal *ngIf="isVisible" title="Entrada de Estoque" [(visible)]="isVisible" (onHide)="closeForm()">
+  <p-card [style]="{width: '50vw'}">
+    <div [formGroup]="form">
+      <p-stepper [(value)]="stepperActiveIndex">
+        @if (form.get('tipo')?.value == entradaEstoqueTipoEnum.COM_FORNECEDOR) {
+          <p-step-list>
+            <p-step [value]="1">Dados Gerais</p-step>
+            <p-step [value]="2">Contas A Pagar</p-step>
+          </p-step-list>
+        }
+        <div>
+          <div [hidden]="stepperActiveIndex != 1">
+            <div>
+              <div class="flex flex-column col-12 gap-3">
+                <div class="flex flex-row">
+                  <div class="flex flex-column gap-2 col-12">
+                    <label for="produto">Produto <span style="color: red">*</span></label>
+                    <p-autoComplete formControlName="produto"
+                                    inputId="produto"
+                                    id="produto"
+                                    fluid
+                                    [suggestions]="produtosSelect"
+                                    (completeMethod)="searchProdutos($event)"
+                                    [optionLabel]="produtoLabel"
+                                    forceSelection
+                                    formValidateMessage
+                                    completeOnFocus
+                                    showClear
+                                    emptyMessage="Nenhum Produto encontrado"
+                                    appendTo="body"
+                    />
+                  </div>
+                </div>
+                <div class="flex flex-row">
+                  <div class="flex flex-column gap-2 col-4">
+                    <label for="quantidade">Quantidade <span style="color: red">*</span></label>
+                    <p-inputNumber id="quantidade" itemid="quantidade" formControlName="quantidade" [min]="1" formValidateMessage/>
+                  </div>
+                  <div class="flex flex-column gap-2 col-4">
+                    <label for="valor">Valor Unitário<span style="color: red">*</span></label>
+                    <p-inputNumber id="valor" itemid="valor" formControlName="valor" [min]="0.01" formValidateMessage mode="currency" currency="BRL"/>
+                  </div>
+                  <div class="flex flex-column gap-2 col-4">
+                    <label for="subtotal">Subtotal</label>
+                    <p-inputNumber id="subtotal"
+                                   itemid="subtotal"
+                                   formControlName="subtotal"
+                                   [min]="0.01"
+                                   formValidateMessage
+                                   mode="currency"
+                                   currency="BRL"
+                    />
+                  </div>
+                </div>
+                <div class="flex flex-row">
+                  <div class="flex flex-column gap-2 col-3">
+                    <label for="tipo">Tipo de Entrada <span style="color: red">*</span></label>
+                    <p-select itemid="tipo"
+                              id="tipo"
+                              formControlName="tipo"
+                              [options]="entradaEstoqueTipoSelect"
+                    />
+                  </div>
+                  @if (form.get('tipo')?.value == entradaEstoqueTipoEnum.COM_FORNECEDOR) {
+                    <div class="flex flex-column gap-2 col-9">
+                      <label for="fornecedor">Fornecedor <span style="color: red">*</span></label>
+                      <p-autoComplete formControlName="fornecedor"
+                                      inputId="fornecedor"
+                                      id="fornecedor"
+                                      fluid
+                                      [suggestions]="fornecedoresSelect"
+                                      (completeMethod)="searchFornecedores($event)"
+                                      optionLabel="nome"
+                                      forceSelection
+                                      formValidateMessage
+                                      completeOnFocus
+                                      showClear
+                                      emptyMessage="Nenhum Fornecedor encontrado"
+                                      appendTo="body"
+                      />
+                    </div>
+                  } @else {
+                    <div class="flex flex-column gap-2 col-9">
+                      <label for="requisitante">Requisitante <span style="color: red">*</span></label>
+                      <input pInputText id="requisitante" formControlName="requisitante" formValidateMessage maxlength="100"/>
+                    </div>
+                  }
+                </div>
+                <div class="flex flex-row">
+                  <div class="flex flex-column gap-2 col-12">
+                    <label for="observacao">Observação</label>
+                    <textarea id="observacao" rows="5" cols="" maxlength="500" pTextarea formValidateMessage formControlName="observacao" style="resize: none"></textarea>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div [hidden]="stepperActiveIndex != 2">
+            <p-scrollPanel [style]="{ height: '30vh' }">
+                <crud-detail [formArray]="contasPagarFormArray"
+                             [createForm]="createContaPagarForm()"
+                             [children]="contasPagarChildren">
+
+                  <crud-detail-column field="dataVencimento" header="Data Vencimento">
+                    <ng-template #input let-entradaEstoque>
+                      <p-datePicker [ngModel]="entradaEstoque.dataVencimento | date:'dd/MM/yyyy'"
+                                    (ngModelChange)="entradaEstoque.dataVencimento = $event"
+                                    [ngModelOptions]="{standalone: true}"
+                                    formValidateMessage
+                                    appendTo="body"
+                                    dateFormat="dd/mm/yy"/>
+                    </ng-template>
+
+                    <ng-template #output let-entradaEstoque>
+                      {{entradaEstoque.dataVencimento | dateFormat}}
+                    </ng-template>
+                  </crud-detail-column>
+                  <crud-detail-column field="valor" header="Valor">
+                    <ng-template #input let-entradaEstoque>
+                      <p-inputNumber [(ngModel)]="entradaEstoque.valor"
+                                     [ngModelOptions]="{standalone: true}"
+                                     [min]="0.01"
+                                     formValidateMessage
+                                     mode="currency"
+                                     currency="BRL"/>
+                    </ng-template>
+
+                    <ng-template #output let-entradaEstoque>
+                      {{entradaEstoque.valor | currencyFormat}}
+                    </ng-template>
+                  </crud-detail-column>
+
+                </crud-detail>
+            </p-scrollPanel>
+          </div>
+        </div>
+      </p-stepper>
+    </div>
+
+    <ng-template #footer>
+      <div class="flex flex-row gap-2 justify-content-end" style="width: 100%">
+        <p-button label="Cancelar" severity="danger" (click)="closeForm()"/>
+        <p-button label="Salvar" severity="success" [disabled]="form.invalid" (click)="save()"/>
+      </div>
+    </ng-template>
+  </p-card>
+</modal>

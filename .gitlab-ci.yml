@@ -1,0 +1,89 @@
+image: node:latest
+
+variables:
+  npm_config_cache: '$CI_PROJECT_DIR/.npm'
+  ELECTRON_CACHE: '$CI_PROJECT_DIR/.cache/electron'
+  ELECTRON_BUILDER_CACHE: '$CI_PROJECT_DIR/.cache/electron-builder'
+
+cache:
+  key: ${CI_COMMIT_REF_SLUG}
+  paths:
+    - .npm/
+    - .cache/electron/
+    - .cache/electron-builder/
+    - node_modules/
+
+stages:
+  - build
+  - test
+  - e2e
+  - installer
+  - publish
+
+install_dependencies:
+  stage: build
+  script:
+    - npm ci
+  artifacts:
+    paths:
+      - node_modules/
+
+.test_template: &test_definition
+  stage: test
+  dependencies:
+    - install_dependencies
+
+electron:
+  <<: *test_definition
+  script:
+    - npm run test:main
+
+angular-client:
+  <<: *test_definition
+  script:
+    - npm run test:client
+
+angular-admin:
+  <<: *test_definition
+  script:
+    - npm run test:admin
+
+win-installer:
+  stage: installer
+  when: manual
+  tags:
+    - windows-runner
+  script:
+    - echo "Building version ${CI_COMMIT_TAG:-0.0.0}"
+    - npm run make:win:client
+    - npm run make:win:admin
+    - echo "Validating installers..."
+    - if not exist "release\Associação-admin-Setup.exe" exit 1
+  artifacts:
+    paths:
+      - release/*.exe
+    expire_in: 1 week
+  dependencies:
+    - install_dependencies
+
+publish-windows-admin:
+  stage: publish
+  when: manual
+  needs:
+    - win-installer
+  script:
+    - |
+      if [ -f "release/Associação-admin-Setup.exe" ]; then
+        curl --header "JOB-TOKEN: $CI_JOB_TOKEN" --upload-file "release/Associação-admin-Setup.exe" "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/association-club/${CI_COMMIT_TAG:-0.0.0}/association-club-setup-${CI_COMMIT_TAG:-0.0.0}.exe"
+      fi
+
+publish-windows-client:
+  stage: publish
+  when: manual
+  needs:
+    - win-installer
+  script:
+    - |
+      if [ -f "release/Associação-client-Setup.exe.exe" ]; then
+        curl --header "JOB-TOKEN: $CI_JOB_TOKEN" --upload-file "release/Associação-client-Setup.exe.exe" "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/association-club/${CI_COMMIT_TAG:-0.0.0}/association-club-setup-${CI_COMMIT_TAG:-0.0.0}.exe"
+      fi

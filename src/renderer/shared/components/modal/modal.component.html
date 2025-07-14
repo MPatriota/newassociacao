@@ -1,0 +1,14 @@
+<div class="modal-overlay" *ngIf="visible" [class.show]="visible" [style]="'z-index:' + zIndex">
+  <div class="modal-container" [ngClass]="{'modal-visible': visible}">
+    <div class="modal-header">
+      <h2 class="modal-title">{{ title }}</h2>
+      <button *ngIf="showClose" class="modal-close-btn" (click)="hide()">
+        <i class="pi pi-times"></i>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <ng-content/>
+    </div>
+  </div>
+</div>

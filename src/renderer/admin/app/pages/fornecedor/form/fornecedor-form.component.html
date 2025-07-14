@@ -1,0 +1,121 @@
+<modal *ngIf="isVisible" title="Cadastro de Fornecedores" [(visible)]="isVisible" (onHide)="closeForm()">
+  <p-card [style]="{width: '50vw'}">
+    <div [formGroup]="form">
+      <p-stepper [(value)]="stepperActiveIndex">
+        <p-step-list>
+          <p-step [value]="1">Dados do Fornecedor</p-step>
+          <p-step [value]="2">Endereço</p-step>
+        </p-step-list>
+        <div>
+          <div [hidden]="stepperActiveIndex != 1">
+            <div class="flex flex-column col-12 gap-3">
+              <div class="flex flex-row">
+                <div class="flex flex-column gap-2 col-12">
+                  <label for="nome">Nome / Razão Social <span style="color: red">*</span></label>
+                  <input pInputText id="nome" formControlName="nome" formValidateMessage maxlength="100"/>
+                </div>
+              </div>
+              <div class="flex flex-row gap-1">
+                <div class="flex flex-column gap-2 col-12">
+                  <label for="documento">Documento <span style="color: red">*</span></label>
+                  <div class="flex">
+                    <p-select itemid="documento" id="documento" formControlName="documentoTipo" [options]="documentoTipoOptions" optionLabel="label" optionValue="value"/>
+                    <div style="width: 100%">
+                      @if (form.get('documentoTipo')?.value === 'cpf') {
+                        <p-inputmask inputId="documento" [mask]="DocumentoTipo.CPF.mask" [unmask]="true" formControlName="documento"
+                                     placeholder="CPF ou CNPJ" [style]="{width: '100%'}"/>
+                      } @else {
+                        <p-inputmask inputId="documento" [mask]="DocumentoTipo.CNPJ.mask" [unmask]="true" formControlName="documento"
+                                     placeholder="CPF ou CNPJ" [style]="{width: '100%'}"/>
+                      }
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="flex flex-row">
+                <div class="flex flex-column gap-2 col-12">
+                  <label for="responsavel">Nome do Responsável</label>
+                  <input pInputText id="responsavel" formControlName="responsavel" formValidateMessage maxlength="100"/>
+                </div>
+              </div>
+              <div class="flex flex-row">
+                <div class="flex flex-column gap-2 col-12">
+                  <label for="email">E-mail</label>
+                  <input pInputText id="email" formControlName="email" formValidateMessage maxlength="255"/>
+                </div>
+              </div>
+              <div class="flex flex-row">
+                <div class="flex flex-column gap-2 col-12">
+                  <label for="telefone">Telefone <span style="color: red">*</span></label>
+                  <input pInputText id="telefone" formControlName="telefone" formValidateMessage maxlength="255"/>
+                </div>
+              </div>
+              <div class="flex flex-row">
+                <div class="flex flex-column gap-2 col-12">
+                  <label for="condicaoPagamento">Condição de Pagamento <span style="color: red">*</span></label>
+                  <p-autoComplete formControlName="condicaoPagamento"
+                                  inputId="condicaoPagamento"
+                                  id="condicaoPagamento"
+                                  fluid
+                                  [suggestions]="condicoesPagamentoSelect"
+                                  (completeMethod)="searchCondicoesPagamento($event)"
+                                  optionLabel="nome"
+                                  forceSelection
+                                  formValidateMessage
+                                  completeOnFocus
+                                  showClear
+                                  emptyMessage="Nenhuma Condição de Pagamento encontrada"
+                                  appendTo="body"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div [hidden]="stepperActiveIndex != 2">
+            <div formGroupName="endereco">
+              <div class="flex flex-column gap-3">
+                <div class="flex flex-row">
+                  <div class="flex flex-column gap-2 col-6">
+                    <label for="cep">CEP <span style="color: red">*</span></label>
+                    <p-inputmask inputId="cep" id="cep" mask="99999-999" [unmask]="true" formControlName="cep" placeholder="87000-000" [style]="{'width': '100%'}" formValidateMessage/>
+                  </div>
+                  <div class="flex flex-column gap-2 col-6">
+                    <label for="logradouro">Logradouro <span style="color: red">*</span></label>
+                    <input pInputText id="logradouro" formControlName="logradouro" formValidateMessage/>
+                  </div>
+                </div>
+                <div class="flex flex-row">
+                  <div class="flex flex-column gap-2 col-6">
+                    <label for="numero">Número <span style="color: red">*</span></label>
+                    <input pInputText id="numero" formControlName="numero" formValidateMessage/>
+                  </div>
+                  <div class="flex flex-column gap-2 col-6">
+                    <label for="bairro">Bairro <span style="color: red">*</span></label>
+                    <input pInputText id="bairro" formControlName="bairro" formValidateMessage/>
+                  </div>
+                </div>
+                <div class="flex flex-row">
+                  <div class="flex flex-column gap-2 col-6">
+                    <label for="cidade">Cidade <span style="color: red">*</span></label>
+                    <input pInputText id="cidade" formControlName="cidade" formValidateMessage/>
+                  </div>
+                  <div class="flex flex-column gap-2 col-6">
+                    <label for="estado">Estado <span style="color: red">*</span></label>
+                    <input pInputText id="estado" formControlName="estado" formValidateMessage/>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </p-stepper>
+    </div>
+
+    <ng-template #footer>
+      <div class="flex flex-row gap-2 justify-content-end" style="width: 100%">
+        <p-button label="Cancelar" severity="danger" (click)="closeForm()"/>
+        <p-button label="Salvar" severity="success" [disabled]="form.pristine || form.invalid" (click)="save()"/>
+      </div>
+    </ng-template>
+  </p-card>
+</modal>

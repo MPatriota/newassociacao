@@ -1,0 +1,250 @@
+<div [class.sidebar-open]="sidebar.sidebarOpen" class="content-wrapper">
+  <p-card>
+
+    <search-bar [icon]="'pi pi-shopping-cart'" [title]="'Gerenciar Produtos'" (onNewClick)="goToNew()"
+                [showAdvancedFilters]="true" (onFilterClick)="sidebar.toggleSidebar()"
+                (onSearch)="onSearch($event)"/>
+
+    <data-table [page]="page" (onPageChange)="loadData($event)">
+
+      <column field="foto" header="Imagem">
+        <ng-template #body let-content>
+          <p-image  *ngIf="content.imagem" [src]="content.imagem"
+                    alt="Image"
+                    width="100"
+                    [preview]="true" />
+        </ng-template>
+      </column>
+
+      <column field="tipo" header="Tipo">
+        <ng-template #body let-content>
+          <p-tag [value]="content.tipo" severity="secondary"/>
+        </ng-template>
+      </column>
+
+      <column field="nome" header="Produto"/>
+
+      <column field="valor" header="Valor">
+        <ng-template #body let-content>
+          {{ content.valor | currency: 'BRL' }}
+        </ng-template>
+      </column>
+
+      <column field="custo" header="Custo">
+        <ng-template #body let-content>
+          {{ content.custo | currency: 'BRL' }}
+        </ng-template>
+      </column>
+
+      <column field="estoque" header="Estoque"/>
+
+      <column field="tag" header="Marcadores">
+
+        <ng-template #body let-content>
+
+          @if (content.tags?.length > 0) {
+
+            @for (tag of getTagsToShow(content); track tag.id) {
+              <tag-viewer style="margin-right: 3px" [value]="tag.name" [background]="tag.color"/>
+            } <span class="tag-viewer-expand" title="Ver todos" *ngIf="content.tags.length > 3"
+                    (click)="onShowAllTags($event, content)">+{{ content.tags.length - 3 }}</span>
+
+          }
+
+        </ng-template>
+
+      </column>
+
+      <column [style]="{ 'width': '100px' }">
+
+        <ng-template #body let-content>
+
+          <div class="flex gap-2">
+
+            <button
+              pButton
+              (click)="onEdit(content)"
+              icon="pi pi-pencil"
+              class="p-button-text p-button-rounded">
+            </button>
+
+            <button
+              pButton
+              icon="pi pi-trash"
+              (click)="onDelete(content)"
+              class="p-button-text p-button-rounded p-button-danger">
+            </button>
+
+          </div>
+
+        </ng-template>
+
+      </column>
+
+    </data-table>
+
+  </p-card>
+</div>
+
+<p-popover #op appendTo="body">
+  <div class="flex flex-col gap-4">
+    <div>
+      <span class="font-medium block mb-2">Marcadores</span>
+
+      <div class="tags-grid">
+        @for (tag of tagsShown; track tag.id) {
+          <tag-viewer [value]="tag.name" [background]="tag.color"/>
+        }
+      </div>
+    </div>
+  </div>
+</p-popover>
+
+<produto-create *ngIf="visibleCreate" [(visibleCreate)]="visibleCreate"
+                (onSave)="onSave()"
+                [defaultProduto]="editObject"
+                (onClose)="editObject = undefined"/>
+
+<sidebar [title]="'Filtros avançados'" #sidebar [icon]="'pi pi-filter'">
+  <div class="filter-container">
+
+    <p-divider [align]="'left'" type="solid">
+      Valor
+    </p-divider>
+
+    <div class="filter-section">
+      <div class="flex gap-2">
+        <span class="p-float-label">
+          <p-inputNumber
+            [(ngModel)]="filters.valorMinimo.value"
+            mode="currency"
+            currency="BRL"
+            locale="pt-BR"
+            [minFractionDigits]="2"
+            placeholder="Menor possível"
+            [maxFractionDigits]="2"
+            styleClass="w-full"
+            inputStyleClass="w-full">
+          </p-inputNumber>
+          <label class="surround-text">Valor mínimo</label>
+        </span>
+
+        <span class="p-float-label">
+          <p-inputNumber
+            [(ngModel)]="filters.valorMaximo.value"
+            mode="currency"
+            currency="BRL"
+            placeholder="Maior possível"
+            locale="pt-BR"
+            [minFractionDigits]="2"
+            [maxFractionDigits]="2"
+            styleClass="w-full"
+            inputStyleClass="w-full">
+          </p-inputNumber>
+          <label class="surround-text">Valor máximo</label>
+        </span>
+      </div>
+    </div>
+
+    <p-divider [align]="'left'" type="solid">
+      Estoque
+    </p-divider>
+
+    <div class="filter-section">
+      <div class="flex gap-2">
+        <span class="p-float-label">
+          <p-inputNumber
+            [(ngModel)]="filters.estoqueMinimo.value"
+            [showButtons]="true"
+            placeholder="Menor possível"
+            [min]="0"
+            styleClass="w-full"
+            inputStyleClass="w-full">
+          </p-inputNumber>
+          <label class="surround-text">Estoque mínimo</label>
+        </span>
+
+        <span class="p-float-label">
+          <p-inputNumber
+            [(ngModel)]="filters.estoqueMaximo.value"
+            [showButtons]="true"
+            placeholder="Maior possível"
+            [min]="0"
+            styleClass="w-full"
+            inputStyleClass="w-full">
+          </p-inputNumber>
+          <label class="surround-text">Estoque máximo</label>
+        </span>
+      </div>
+    </div>
+
+    <p-divider [align]="'left'" type="solid">
+      Tipo de Produto
+    </p-divider>
+
+    <div class="filter-section">
+      <p-selectButton
+        [options]="tiposFiltro"
+        [(ngModel)]="filters.types.value"
+        [multiple]="true"
+        optionLabel="label"
+        optionValue="value">
+      </p-selectButton>
+    </div>
+
+    <p-divider [align]="'left'" type="solid">
+      Tags
+    </p-divider>
+
+    <div class="filter-section">
+
+      <p-autocomplete
+        emptyMessage="Nenhum marcador encontrado"
+        [suggestions]="filteredTags"
+        (completeMethod)="filterTags($event)"
+        [(ngModel)]="filters.tags.value"
+        multiple
+        [completeOnFocus]="true"
+        optionLabel="name"
+        placeholder="Seleciona um marcador"
+        [dropdown]="true"
+        styleClass="w-full md:w-56">
+
+        <ng-template pTemplate="dropdownicon">
+          <i class="pi pi-tag"></i>
+        </ng-template>
+
+        <ng-template pTemplate="item" let-tag>
+          <tag-viewer [value]="tag.name" [background]="tag.color"/>
+        </ng-template>
+
+        <ng-template pTemplate="header">
+          <div class="font-medium p-3">Marcadores disponíveis</div>
+        </ng-template>
+
+      </p-autocomplete>
+
+    </div>
+
+    <div class="filter-actions" style="margin-top: 1rem;">
+
+      <p-button
+        label="Limpar Filtros"
+        fluid
+        severity="secondary"
+        [style]="{ 'margin-bottom': '5px' }"
+        (onClick)="clearFilters()">
+      </p-button>
+
+      <p-button
+        label="Aplicar Filtros"
+        severity="success"
+        icon="pi pi-filter"
+        fluid
+        (onClick)="applyFilters()">
+      </p-button>
+    </div>
+
+  </div>
+
+</sidebar>

@@ -1,0 +1,59 @@
+<modal *ngIf="isVisible" title="Cadastro de Condições de Pagamento" [(visible)]="isVisible" (onHide)="closeForm()">
+  <p-card [style]="{width: '50vw'}">
+    <div [formGroup]="form">
+      <div>
+        <div class="flex flex-column col-12 gap-3">
+          <div class="flex flex-row">
+            <div class="flex flex-column gap-2 col-7">
+              <label for="nome">Nome <span style="color: red">*</span></label>
+              <input pInputText id="nome" formControlName="nome" formValidateMessage maxlength="50"/>
+            </div>
+            <div class="flex gap-2 col-1 align-items-center">
+              <p-checkbox formControlName="ativa" inputId="ativa" id="ativa" [binary]="true"/>
+              <label for="ativa">Ativa</label>
+            </div>
+            <div class="flex gap-2 col-2 align-items-center">
+              <p-checkbox formControlName="obrigadoInformarCliente" inputId="obrigadoInformarCliente" id="obrigadoInformarCliente" [binary]="true"/>
+              <label for="obrigadoInformarCliente">Obrigado informar cliente na venda</label>
+            </div>
+            <div class="flex gap-2 col-2 align-items-center">
+              <p-checkbox formControlName="aVista" inputId="aVista" id="aVista" [binary]="true"/>
+              <label for="aVista">À vista</label>
+            </div>
+          </div>
+          <div class="flex flex-row">
+            <div class="flex flex-column gap-2 col-12">
+              <label for="parcelas">Parcelas <span style="color: red">*</span></label>
+              <p-inputNumber id="parcelas" itemid="parcelas" formControlName="parcelas" [min]="0" formValidateMessage/>
+            </div>
+          </div>
+          <div class="flex flex-row">
+            <div class="flex flex-column gap-2 col-12">
+              <label for="intervalo">Intervalo <span style="color: red">*</span></label>
+              <p-inputNumber id="intervalo" itemid="intervalo" formControlName="intervalo" [min]="0" formValidateMessage/>
+            </div>
+          </div>
+          <div class="flex flex-row">
+            <div class="flex flex-column gap-2 col-12">
+              <label for="vencimento">Vencimento <span style="color: red">*</span></label>
+              <p-inputNumber id="vencimento" itemid="vencimento" formControlName="vencimento" [min]="0" formValidateMessage/>
+            </div>
+          </div>
+          <div class="flex flex-row">
+            <div class="flex flex-column gap-2 col-12">
+              <label for="descricao">Descrição</label>
+              <textarea id="descricao" rows="5" cols="40" pTextarea formValidateMessage formControlName="descricao" style="resize: none"></textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <ng-template #footer>
+      <div class="flex flex-row gap-2 justify-content-end" style="width: 100%">
+        <p-button label="Cancelar" severity="danger" (click)="closeForm()"/>
+        <p-button label="Salvar" severity="success" [disabled]="form.pristine || form.invalid" (click)="save()"/>
+      </div>
+    </ng-template>
+  </p-card>
+</modal>

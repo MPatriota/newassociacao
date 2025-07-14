@@ -1,0 +1,35 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "commonjs",
+    "sourceMap": true,
+    "outDir": "dist/electron",
+    "rootDir": "src/main",
+    "strict": true,
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "allowJs": true,
+    "incremental": true,
+    "tsBuildInfoFile": "./dist/electron/.tsbuildinfo",
+    "baseUrl": ".",
+    "noEmitOnError": true,
+    "removeComments": true,
+    "paths": {
+      "*": [
+        "node_modules/*"
+      ]
+    }
+  },
+  "include": [
+    "src/main/electron/**/*",
+    "src/main/template/**/*"
+  ],
+  "exclude": [
+    "src/renderer/**/*",
+    "node_modules"
+  ]
+}

@@ -1,0 +1,450 @@
+<p-card>
+  <search-bar title="Agendamentos de Quiosque" (onNewClick)="clickNew()" (onSearch)="onSearch($event)"/>
+
+  <data-table [page]="page" (onPageChange)="loadData($event)">
+
+    <column field="id" header="Código"/>
+
+    <column field="quiosque" header="Quiosque">
+      <ng-template #body let-content>
+        {{content.quiosque.nome}}
+      </ng-template>
+    </column>
+
+    <column field="cliente" header="Cliente">
+      <ng-template #body let-content>
+        {{content.cliente.nome}}
+      </ng-template>
+    </column>
+
+    <column field="data" header="Data">
+      <ng-template #body let-content>
+        {{content.data | dateFormat}}
+      </ng-template>
+    </column>
+
+    <column field="horaInicio" header="Hora Início">
+      <ng-template #body let-content>
+        {{content.horaInicio | timeFormat}}
+      </ng-template>
+    </column>
+
+    <column field="horaFim" header="Hora Fim">
+      <ng-template #body let-content>
+        {{content.horaFim | timeFormat}}
+      </ng-template>
+    </column>
+
+    <column field="valor" header="Valor">
+      <ng-template #body let-content>
+        {{content.valor | currencyFormat}}
+      </ng-template>
+    </column>
+
+    <column [style]="{ 'width': '100px' }">
+
+      <ng-template #body let-content>
+
+        <div class="flex gap-2 justify-content-end">
+
+          <button
+            pButton
+            (click)="printConferenciaUtensilios(content)"
+            pTooltip="Conferência de Utensílios"
+            icon="pi pi-print"
+            class="p-button-text p-button-rounded">
+          </button>
+
+          <button
+            pButton
+            (click)="print(content)"
+            pTooltip="Termo"
+            icon="pi pi-print"
+            class="p-button-text p-button-rounded">
+          </button>
+
+          <button
+            pButton
+            (click)="edit(content)"
+            pTooltip="Editar"
+            icon="pi pi-pencil"
+            class="p-button-text p-button-rounded">
+          </button>
+
+          <button
+            pButton
+            (click)="delete(content)"
+            pTooltip="Excluir"
+            icon="pi pi-trash"
+            class="p-button-text p-button-rounded p-button-danger">
+          </button>
+        </div>
+
+      </ng-template>
+
+    </column>
+
+  </data-table>
+
+</p-card>
+
+<p-confirmDialog />
+
+<agendamento-quiosque-form [isVisibleChange]="formVisibleChange" (onSave)="onSave()"/>
+
+<sidebar [title]="'Filtros avançados'" #sidebar [icon]="'pi pi-filter'">
+  <div class="filter-container">
+
+    <p-divider [align]="'left'" type="solid">
+      Data do Agendamento
+    </p-divider>
+
+    <div class="filter-section">
+      <div class="flex gap-2">
+        <span class="p-float-label">
+          <p-datePicker [ngModel]="advancedFilters.dataAgendamentoInicial.value | date:'dd/MM/yyyy'"
+                        (ngModelChange)="advancedFilters.dataAgendamentoInicial.value = formatDate($event)"
+                        [ngModelOptions]="{standalone: true}"
+                        appendTo="body"
+                        showClear="true"
+                        dateFormat="dd/mm/yy"/>
+          <label class="surround-text">Data Inicial</label>
+        </span>
+
+        <span class="p-float-label">
+          <p-datePicker [ngModel]="advancedFilters.dataAgendamentoFinal.value | date:'dd/MM/yyyy'"
+                        (ngModelChange)="advancedFilters.dataAgendamentoFinal.value = formatDate($event)"
+                        [ngModelOptions]="{standalone: true}"
+                        appendTo="body"
+                        showClear="true"
+                        dateFormat="dd/mm/yy"/>
+          <label class="surround-text">Data Final</label>
+        </span>
+      </div>
+    </div>
+
+    <p-divider [align]="'left'" type="solid">
+      Quiosque
+    </p-divider>
+
+    <div class="filter-section">
+      <div class="flex gap-2">
+        <span class="p-float-label">
+          <p-autoComplete [(ngModel)]="advancedFilters.quiosque.value"
+                          inputId="quiosque"
+                          id="quiosque"
+                          fluid
+                          [suggestions]="quiosqueSelect"
+                          (completeMethod)="searchQuiosques($event)"
+                          optionLabel="nome"
+                          forceSelection
+                          completeOnFocus
+                          showClear
+                          emptyMessage="Nenhum Quiosque encontrado"
+                          appendTo="body"
+          />
+          <label class="surround-text">Quiosque</label>
+        </span>
+      </div>
+    </div>
+
+    <p-divider [align]="'left'" type="solid">
+      Cliente
+    </p-divider>
+
+    <div class="filter-section">
+      <div class="flex gap-2">
+        <span class="p-float-label">
+          <p-autoComplete [(ngModel)]="advancedFilters.cliente.value"
+                          inputId="cliente"
+                          id="cliente"
+                          fluid
+                          [suggestions]="clientesSelect"
+                          (completeMethod)="searchClientes($event)"
+                          optionLabel="nome"
+                          forceSelection
+                          completeOnFocus
+                          showClear
+                          emptyMessage="Nenhum Cliente encontrado"
+                          appendTo="body"
+          />
+          <label class="surround-text">Cliente</label>
+        </span>
+      </div>
+    </div>
+
+    <div class="filter-actions" style="margin-top: 1rem;">
+
+      <p-button
+        label="Limpar Filtros"
+        fluid
+        severity="secondary"
+        [style]="{ 'margin-bottom': '5px' }"
+        (onClick)="clearFilters()">
+      </p-button>
+
+      <p-button
+        label="Aplicar Filtros"
+        severity="success"
+        icon="pi pi-filter"
+        fluid
+        (onClick)="applyAdvancedFilters()">
+      </p-button>
+    </div>
+
+  </div>
+
+</sidebar>
+
+<div #printSection [hidden]="true">
+
+  <!-- CONTRATO -->
+  <div style="display: flex;gap: 10px">
+    <img style="width: 70px" [src]="'./assets/images/logo.jpeg'">
+
+    <div style="display: flex;flex-direction: column;flex: 1;text-align: center;justify-content: space-between">
+      <b style="font-size: 20px">Associação dos Docentes da Universidade Estadual de Maringá</b>
+      <b style="font-size: 18px">Contrato de Utilização do Quiosque {{agendamentoToPrint?.quiosque?.nome}}</b>
+    </div>
+  </div>
+
+  <p>
+    Que acordam entre si, de um lado <strong>ADUEM - ASSOCIAÇÃO DOS DOCENTES DA UNIVERSIDADE ESTADUAL DE MARINGÁ</strong>,
+    pessoa jurídica de direito privado, sem fins lucrativos, inscrita no CGC do MF sob nº 77.924.637/0001-07, estabelecida na Rua Prof. Itamar Orlando Soares, nº 305, Jd. Universitário, Maringá/PR, e do outro,
+    {{agendamentoToPrint?.cliente?.nome}}, Endereço Completo: {{agendamentoToPrint?.cliente?.endereco?.logradouro}} nº {{agendamentoToPrint?.cliente?.endereco?.numero}},
+    E-mail: {{agendamentoToPrint?.cliente?.email}} e Matricula: {{agendamentoToPrint?.cliente?.matricula}}
+  </p>
+
+  <div class="clausula"><strong>Cláusula 1ª:</strong> O presente contrato destina-se à utilização das dependências do Centro de Esportes e Lazer/ADUEM, conforme solicitado e aprovado pela diretoria no termo de solicitação de uso anexo.</div>
+  <div class="clausula"><strong>Cláusula 2ª:</strong> Pela utilização o usuário pagará a importância de {{agendamentoToPrint?.valor | currencyFormat}}</div>
+  <div class="clausula"><strong>Cláusula 3ª:</strong> A ADUEM colocará à disposição do usuário, no dia solicitado para o evento agendado, todos os equipamentos e utensílios solicitados, bem como banheiros em perfeito estado de uso.</div>
+  <div class="clausula"><strong>Cláusula 4ª:</strong> Em caso de desistência da utilização, o usuário deverá comunicar a ADUEM com antecedência mínima estipulada no regulamento, caso contrário pagará multa correspondente a 30% (trinta por cento) da taxa de reserva, por prejuízo a outros associados.</div>
+  <div class="clausula"><strong>Cláusula 5ª:</strong> O associado deverá permanecer no Centro de Esportes e Lazer/ADUEM durante todo o período da festa, até o fechamento pelo funcionário da Aduem, sendo responsável pelos possíveis estragos aos equipamentos e utensílios, patrimônio e vandalismo de qualquer ordem dos participantes do evento.</div>
+  <div class="clausula"><strong>Cláusula 6ª:</strong> É expressamente proibida a sub-cessão, bem como a cobrança de ingressos ou consumação, sob pena de multa de 1(um) salário mínimo nacional, mais suspensão de direito de uso por 30 (trinta) dias.</div>
+  <div class="clausula"><strong>Cláusula 7ª:</strong>  O associado, desde já, autoriza a ADUEM a proceder os descontos em sua conta corrente das despesas efetuadas, danos ao patrimônio, utensílios e equipamentos (art. 15 do Regulamento interno do Centro de Esportes e Lazer/ADUEM). Parágrafo único. Em caso de defeito ou pane elétrica ou hidráulica, o associado deverá comunicar imediatamente a portaria da ADUEM para as devidas providências, não sendo permitido qualquer reparo por parte do usuário.</div>
+  <div class="clausula"><strong>Cláusula 8ª:</strong> É proibido fazer barulho, algazarra, utilização de som automotivo fora da área de estacionamento ou utilizar aparelhos sonoros a partir das 22h (de acordo com a lei) ficando o contratante responsável por manter a ordem. A não observância desta cláusula ensejará o pagamento de multa estipulada pela diretoria.</div>
+  <div class="clausula"><strong>Cláusula 9ª:</strong> Os resíduos do evento deverão ser acondicionados em recipientes apropriados, disponíveis no local.</div>
+  <div class="clausula"><strong>Cláusula 10:</strong> A retirada da decoração e objetos trazidos pelo associado para o evento devem ser retirados até o fim do horário determinado para o uso (1h da manhã), sendo proibida a colagem de decoração a fim de preservar a pintura.</div>
+  <div class="clausula"><strong>Cláusula 11:</strong> A responsabilidade por objetos extraviados é inteiramente do responsável pelo evento. Parágrafo único. É proibida a instalação de brinquedos infláveis ou pula-pula no interior do quiosque.</div>
+  <div class="clausula"><strong>Cláusula 12:</strong> - A contratação da utilização do quiosque não inclui a área de convivência, parque infantil, piscina, sauna, ofurô e campo de futebol suíço. Parágrafo único. Os usuários do quiosque deverão utilizar o estacionamento inferior da sede.</div>
+  <div class="clausula"><strong>Cláusula 13:</strong> - O usuário está ciente das condições acima e responsabiliza-se pelo cumprimento das normas para utilização da sede da ADUEM, da qual tem conhecimento.</div>
+  <div class="clausula"><strong>Cláusula 14:</strong> Elegem as partes o foro da Comarca de Maringá – PR, para dirimir quaisquer dúvidas ou controvérsias a respeito do presente contrato. E por estarem justos e acordados, firmam o presente em duas vias de igual teor, na presença de duas testemunhas.</div>
+  <div class="local-data">
+    <p>Maringá, {{dataAtual?.format('DD')}} de {{mes(dataAtual?.month())}} de {{dataAtual?.year()}}</p>
+  </div>
+
+  <div style="display: flex;justify-content: center;gap: 100px">
+    <p style="text-align: center">_____________________________________ <br> CONTRATANTE</p>
+    <p style="text-align: center">_____________________________________ <br> ADUEM</p>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- SOLICITAÇÃO -->
+  <div style="display: flex;gap: 10px">
+    <img style="width: 70px" [src]="'./assets/images/logo.jpeg'">
+
+    <div style="display: flex;flex-direction: column;flex: 1;text-align: center;justify-content: space-between">
+      <b style="font-size: 20px">Associação dos Docentes da Universidade Estadual de Maringá</b>
+      <b style="font-size: 18px">Solicitação de Uso do Quiosque {{agendamentoToPrint?.quiosque?.nome}}</b>
+    </div>
+  </div>
+
+  <div style="display: flex;column-gap: 20px;flex-wrap: wrap;margin: 20px 0">
+    <div class="campo">ASSOCIADO: {{agendamentoToPrint?.cliente?.nome}}</div>
+    <div class="campo">E-mail: {{agendamentoToPrint?.cliente?.email}}</div>
+    <div class="campo">Dia da semana: {{diaSemana(dataAtual?.weekday())}}</div>
+    <div class="campo">DATA: {{dataAgendamento?.format('DD')}}/{{dataAgendamento?.format('MM')}}/{{dataAgendamento?.year()}}</div>
+    <div class="campo">PERÍODO: (Das {{horaInicio?.format('HH')}}h à {{horaFim?.format('HH')}}h) <b>Início:</b> {{horaInicio?.format('HH')}}:{{horaInicio?.format('mm')}} &nbsp;&nbsp; <b>Término:</b> {{horaFim?.format('HH')}}:{{horaFim?.format('mm')}}</div>
+  </div>
+
+  <div>
+    {{agendamentoToPrint?.descricao}}
+  </div>
+
+  <div class="observacoes">
+    <p>1. Estou ciente de que devo comunicar a desistência da utilização do espaço com antecedência mínima de 2
+      (dois) dias da data de reserva, caso contrário pagarei multa correspondente a 30% da taxa de reserva, por
+      prejuízo a outros associados.</p>
+    <p>2. Deverei permanecer no local durante todo o período do evento até o fechamento pelo funcionário da
+      ADUEM e serei responsável pelos possíveis estragos de equipamento, utensílios, patrimônio e vandalismos
+      de qualquer ordem.</p>
+    <p>3. A reserva é feita exclusivamente para o espaço solicitado, não incluindo demais dependências do Centro
+      de Esportes e Lazer ADUEM.</p>
+    <p>4. Estou ciente que o horário de encerramento do evento e fechamento do portão será no máximo até à 01h. O
+      não cumprimento dessa condição implicará em multa de um salário mínimo vigente.</p>
+    <p>5. O período da reserva é das {{horaInicio?.format('HH')}}h à {{horaFim?.format('HH')}}h. Não será permitida entrada antes do horário para decoração ou refrigeração de bebidas.</p>
+    <p>6. É proibida a colagem de decoração tais como bexigas, cartazes, enfeites etc no teto, pilar, vidros e paredes,
+      pois danifica a pintura.</p>
+    <p>7. É proibida a montagem de brinquedos infláveis ou pula-pula dentro do salão de festas, devendo ser utilizado
+      o espaço ao lado do pergolado.</p>
+    <p>8. É proibida a cobrança de ingressos, convites ou taxa de qualquer natureza e a sub-cessão.</p>
+    <p>9. Serão disponibilizados pratos, talheres, espetos e grelhas, fogão, freezer, não incluindo copos, panelas,
+      vasilha e demais utensílios.</p>
+  </div>
+
+  <div style="display: flex;justify-content: center;gap: 100px">
+    <p>Maringá, {{dataAtual?.format('DD')}} de {{mes(dataAtual?.month())}} de {{dataAtual?.year()}}.</p>
+    <p style="text-align: center">_____________________________________<br>Assinatura do Associado</p>
+  </div>
+
+</div>
+
+<div #printSectionSalao [hidden]="true">
+
+  <!-- CONTRATO -->
+  <div style="display: flex;gap: 10px">
+    <img style="width: 70px" [src]="'./assets/images/logo.jpeg'">
+
+    <div style="display: flex;flex-direction: column;flex: 1;text-align: center;justify-content: space-between">
+      <b style="font-size: 20px">Associação dos Docentes da Universidade Estadual de Maringá</b>
+      <b style="font-size: 18px">CONTRATO DE UTILIZAÇÃO DO SALÃO DE EVENTOS {{agendamentoToPrint?.quiosque?.nome}}</b>
+    </div>
+  </div>
+
+  <p>
+    Que acordam entre si, de um lado <strong>ADUEM - ASSOCIAÇÃO DOS DOCENTES DA UNIVERSIDADE ESTADUAL DE MARINGÁ</strong>,
+    pessoa jurídica de direito privado, sem fins lucrativos, inscrita no CGC do MF sob nº 77.924.637/0001-07, estabelecida na Rua Prof. Itamar Orlando Soares, nº 305, Jd. Universitário, Maringá/PR, e do outro,
+    {{agendamentoToPrint?.cliente?.nome}}, Endereço Completo: {{agendamentoToPrint?.cliente?.endereco?.logradouro}} nº {{agendamentoToPrint?.cliente?.endereco?.numero}},
+    E-mail: {{agendamentoToPrint?.cliente?.email}} e Matricula: {{agendamentoToPrint?.cliente?.matricula}}
+  </p>
+
+  <div class="clausula"><strong>Cláusula 1ª:</strong> O presente contrato destina-se à utilização das dependências do Centro de Esportes e Lazer/ADUEM, conforme solicitado e aprovado pela diretoria no termo de solicitação de uso anexo.</div>
+  <div class="clausula"><strong>Cláusula 2ª:</strong> Pela utilização o usuário pagará a importância de {{agendamentoToPrint?.valor | currencyFormat}}</div>
+  <div class="clausula"><strong>Cláusula 3ª:</strong> A ADUEM colocará à disposição do usuário, no dia solicitado para o evento agendado, todos os equipamentos e utensílios solicitados, bem como banheiros em perfeito estado de uso.</div>
+  <div class="clausula"><strong>Cláusula 4ª:</strong> Em caso de desistência da utilização, o usuário deverá comunicar a ADUEM com antecedência mínima estipulada no regulamento, caso contrário pagará multa correspondente a 30% (trinta por cento) da taxa de reserva, por prejuízo a outros associados.</div>
+  <div class="clausula"><strong>Cláusula 5ª:</strong> O associado deverá permanecer no Centro de Esportes e Lazer/ADUEM durante todo o período da festa, até o fechamento pelo funcionário da Aduem, sendo responsável pelos possíveis estragos aos equipamentos e utensílios, patrimônio e vandalismo de qualquer ordem dos participantes do evento.</div>
+  <div class="clausula"><strong>Cláusula 6ª:</strong> É expressamente proibida a sub-cessão, bem como a cobrança de ingressos ou consumação, sob pena de multa de 1(um) salário mínimo nacional, mais suspensão de direito de uso por 30 (trinta) dias.</div>
+  <div class="clausula"><strong>Cláusula 7ª:</strong>  O associado, desde já, autoriza a ADUEM a proceder os descontos em sua conta corrente das despesas efetuadas, danos ao patrimônio, utensílios e equipamentos (art. 15 do Regulamento interno do Centro de Esportes e Lazer/ADUEM). Parágrafo único. Em caso de defeito ou pane elétrica ou hidráulica, o associado deverá comunicar imediatamente a portaria da ADUEM para as devidas providências, não sendo permitido qualquer reparo por parte do usuário.</div>
+  <div class="clausula"><strong>Cláusula 8ª:</strong> É proibido fazer barulho, algazarra, utilização de som automotivo fora da área de estacionamento ou utilizar aparelhos sonoros a partir das 22h (de acordo com a lei) ficando o contratante responsável por manter a ordem. A não observância desta cláusula ensejará o pagamento de multa estipulada pela diretoria.</div>
+  <div class="clausula"><strong>Cláusula 9ª:</strong> Os resíduos do evento deverão ser acondicionados em recipientes apropriados, disponíveis no local.</div>
+  <div class="clausula"><strong>Cláusula 10:</strong> A retirada da decoração e objetos trazidos pelo associado para o evento devem ser retirados até o fim do horário determinado para o uso (1h da manhã), sendo proibida a colagem de decoração a fim de preservar a pintura.</div>
+  <div class="clausula"><strong>Cláusula 11:</strong> A responsabilidade por objetos extraviados é inteiramente do responsável pelo evento. Parágrafo único. É proibida a instalação de brinquedos infláveis ou pula-pula no interior do salão, devendo ser utilizada a área apropriada para os brinquedos, na entrada do salão.</div>
+  <div class="clausula"><strong>Cláusula 12:</strong> - A contratação da utilização do quiosque não inclui a área de convivência, parque infantil, piscina, sauna, ofurô e campo de futebol suíço. Parágrafo único. Os usuários do quiosque deverão utilizar o estacionamento inferior da sede.</div>
+  <div class="clausula"><strong>Cláusula 13:</strong> - O usuário está ciente das condições acima e responsabiliza-se pelo cumprimento das normas para utilização da sede da ADUEM, da qual tem conhecimento.</div>
+  <div class="clausula"><strong>Cláusula 14:</strong> Elegem as partes o foro da Comarca de Maringá – PR, para dirimir quaisquer dúvidas ou controvérsias a respeito do presente contrato. E por estarem justos e acordados, firmam o presente em duas vias de igual teor, na presença de duas testemunhas.</div>
+  <div class="local-data">
+    <p>Maringá, {{dataAtual?.format('DD')}} de {{mes(dataAtual?.month())}} de {{dataAtual?.year()}}</p>
+  </div>
+
+  <div style="display: flex;justify-content: center;gap: 100px">
+    <p style="text-align: center">_____________________________________ <br> CONTRATANTE</p>
+    <p style="text-align: center">_____________________________________ <br> ADUEM</p>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- SOLICITAÇÃO -->
+  <div style="display: flex;gap: 10px">
+    <img style="width: 70px" [src]="'./assets/images/logo.jpeg'">
+
+    <div style="display: flex;flex-direction: column;flex: 1;text-align: center;justify-content: space-between">
+      <b style="font-size: 20px">Associação dos Docentes da Universidade Estadual de Maringá</b>
+      <b style="font-size: 18px">SOLICITAÇÃO DE USO SALÃO DE EVENTOS {{agendamentoToPrint?.quiosque?.nome}}</b>
+    </div>
+  </div>
+
+  <div style="display: flex;column-gap: 20px;flex-wrap: wrap;margin: 20px 0">
+    <div class="campo">ASSOCIADO: {{agendamentoToPrint?.cliente?.nome}}</div>
+    <div class="campo">E-mail: {{agendamentoToPrint?.cliente?.email}}</div>
+    <div class="campo">Dia da semana: {{diaSemana(dataAtual?.weekday())}}</div>
+    <div class="campo">DATA: {{dataAgendamento?.format('DD')}}/{{dataAgendamento?.format('MM')}}/{{dataAgendamento?.year()}}</div>
+    <div class="campo">PERÍODO: (Das {{horaInicio?.format('HH')}}h à {{horaFim?.format('HH')}}h) <b>Início:</b> {{horaInicio?.format('HH')}}:{{horaInicio?.format('mm')}} &nbsp;&nbsp; <b>Término:</b> {{horaFim?.format('HH')}}:{{horaFim?.format('mm')}}</div>
+  </div>
+
+  <div>
+    {{agendamentoToPrint?.descricao}}
+  </div>
+
+  <div class="observacoes">
+    <p>1. Estou ciente de que devo comunicar a desistência da utilização do espaço com antecedência mínima de 2
+      (dois) dias da data de reserva, caso contrário pagarei multa correspondente a 30% da taxa de reserva, por
+      prejuízo a outros associados.</p>
+    <p>2. Deverei permanecer no local durante todo o período do evento até o fechamento pelo funcionário da
+      ADUEM e serei responsável pelos possíveis estragos de equipamento, utensílios, patrimônio e vandalismos
+      de qualquer ordem.</p>
+    <p>3. A reserva é feita exclusivamente para o espaço solicitado, não incluindo demais dependências do Centro
+      de Esportes e Lazer ADUEM.</p>
+    <p>4. Estou ciente que o horário de encerramento do evento e fechamento do portão será no máximo até à 01h. O
+      não cumprimento dessa condição implicará em multa de um salário mínimo vigente.</p>
+    <p>5. O período da reserva é das {{horaInicio?.format('HH')}}h à {{horaFim?.format('HH')}}h. Não será permitida entrada antes do horário para decoração ou refrigeração de bebidas.</p>
+    <p>6. É proibida a colagem de decoração tais como bexigas, cartazes, enfeites etc no teto, pilar, vidros e paredes,
+      pois danifica a pintura.</p>
+    <p>7. É proibida a montagem de brinquedos infláveis ou pula-pula dentro do salão de festas, devendo ser utilizado
+      o espaço ao lado do pergolado.</p>
+    <p>8. É proibida a cobrança de ingressos, convites ou taxa de qualquer natureza e a sub-cessão.</p>
+  </div>
+
+  <div style="display: flex;justify-content: center;gap: 100px">
+    <p>Maringá, {{dataAtual?.format('DD')}} de {{mes(dataAtual?.month())}} de {{dataAtual?.year()}}.</p>
+    <p style="text-align: center">_____________________________________<br>Assinatura do Associado</p>
+  </div>
+
+</div>
+
+<div #printSectionConferencia [hidden]="true">
+  <div style="display: flex;flex-direction: column;gap: 60px">
+
+    <div style="display: flex;flex-direction: column;gap: 3px;align-items: center">
+      <h2 style="margin: 0;">{{associacao?.nomeFantasia}}</h2>
+      <div style="font-size: 0.8rem"><b>Endereço:</b> {{associacao?.endereco}}</div>
+      <div style="font-size: 0.8rem"><b>Telefone:</b> {{associacao?.telefone}}</div>
+    </div>
+
+    <div style="display: flex;flex-direction: column;gap: 5px">
+      <div style="display: flex;justify-content: space-between">
+        <div><b>Nome Quiosque:</b> {{agendamentoToPrint?.quiosque?.nome}}</div>
+        <div><b>Data/Hora Agendamento:</b> {{agendamentoToPrint?.data | dateFormat}} - {{agendamentoToPrint?.horaInicio | timeFormat}} - {{agendamentoToPrint?.horaFim | timeFormat}}</div>
+      </div>
+      <div><b>Cliente Agendamento:</b> {{agendamentoToPrint?.cliente?.nome}}</div>
+    </div>
+
+    <div>
+
+      <h2 style="text-align: center">Utensílios</h2>
+      <table style="width: 100%">
+        <thead style="font-weight: bold">
+        <tr>
+          <td>
+            Nome Utensílio
+          </td>
+          <td style="text-align: center">
+            Quantidade
+          </td>
+          <td style="text-align: center">
+            Verificou
+          </td>
+        </tr>
+        </thead>
+
+        <tbody>
+        <tr *ngFor="let utensilio of agendamentoToPrint?.quiosque?.utensilios">
+          <td>
+            {{utensilio.utensilio.nome}}
+          </td>
+          <td style="text-align: center">
+            {{utensilio.quantidade}}
+          </td>
+          <td>
+            <div style="border-width: 1px;
+                          border-color: black;
+                          width: 20px;
+                          height: 20px;
+                          margin: auto;
+                          border-style: solid">
+            </div>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div style="display: flex; flex-direction: column;gap: 40px">
+      <div>Nome de quem conferiu: </div>
+      <div style="border-width: 1px;
+                  border-color: black;
+                  border-style: solid"></div>
+    </div>
+  </div>
+
+</div>

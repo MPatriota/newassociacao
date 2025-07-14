@@ -1,0 +1,49 @@
+.tag-viewer-expand:hover {
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.tags-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.content-wrapper {
+
+  transition: all 0.3s ease;
+  padding-right: 25px;
+
+  &.sidebar-open {
+    padding-right: 500px;
+  }
+
+}
+
+.filter-container {
+  padding: 0 1.5rem 1.5rem;
+}
+
+.filter-section {
+  border-bottom: 1px solid var(--surface-200);
+}
+
+.filter-section h3 {
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-color);
+}
+.filter-actions {
+  position: sticky;
+  bottom: 0;
+  background: var(--surface-card);
+  padding: 1rem;
+  margin: 0 -1rem -1rem -1rem;
+  border-top: 1px solid var(--surface-200);
+}
+
+.surround-text {
+  color: #9ca3af;
+  font-size: 0.85rem;
+}

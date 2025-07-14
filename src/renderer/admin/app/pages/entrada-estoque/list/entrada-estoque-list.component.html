@@ -1,0 +1,54 @@
+<p-card>
+  <search-bar title="Entrada de Estoque" (onNewClick)="clickNew()" (onSearch)="onSearch($event)"/>
+
+  <data-table [page]="page" (onPageChange)="loadData($event)">
+
+    <column field="produto" header="Produto">
+      <ng-template #body let-content>
+        {{content.produto.nome}}
+      </ng-template>
+    </column>
+    <column field="quantidade" header="Quantidade"/>
+    <column field="valor" header="Valor Unitário">
+      <ng-template #body let-content>
+        {{content.valor | currencyFormat}}
+      </ng-template>
+    </column>
+    <column field="data" header="Data de Cadastro">
+      <ng-template #body let-content>
+        {{content.dataCadastro | dateFormat}}
+      </ng-template>
+    </column>
+
+    <column [style]="{ 'width': '100px' }">
+
+      <ng-template #body let-content>
+
+        <div class="flex gap-2">
+
+          <button
+            pButton
+            (click)="edit(content)"
+            icon="pi pi-pencil"
+            class="p-button-text p-button-rounded">
+          </button>
+
+          <button
+            pButton
+            (click)="delete(content)"
+            icon="pi pi-trash"
+            class="p-button-text p-button-rounded p-button-danger">
+          </button>
+        </div>
+
+      </ng-template>
+
+    </column>
+
+  </data-table>
+  
+</p-card>
+
+<p-confirmDialog />
+
+<entrada-estoque-form [isVisibleChange]="formVisibleChange" (onSave)="onSave()"/>

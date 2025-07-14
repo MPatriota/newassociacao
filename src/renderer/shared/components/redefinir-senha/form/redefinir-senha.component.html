@@ -1,0 +1,29 @@
+<p-card>
+  <div [formGroup]="form">
+    <div class="flex flex-column col-12 gap-3">
+
+      <p class="text-center">Por favor informe uma nova senha</p>
+
+      <div class="flex flex-row">
+        <div class="flex flex-column gap-2 col-12">
+          <label for="nome">Senha</label>
+          <p-password formControlName="senha" [toggleMask]="true" [feedback]="false" styleClass="w-full" inputStyleClass="w-full" formValidateMessage/>
+        </div>
+      </div>
+
+      <div class="flex flex-row">
+        <div class="flex flex-column gap-2 col-12">
+          <label for="nome">Confirme a Senha</label>
+          <p-password formControlName="confirmacaoSenha" [toggleMask]="true" [feedback]="false" styleClass="w-full" inputStyleClass="w-full" formValidateMessage/>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <ng-template #footer>
+    <div class="flex flex-row gap-2 justify-content-end" style="width: 100%">
+      <p-button label="Alterar Senha" severity="success" (click)="redefinirSenha()" [disabled]="form.invalid"/>
+    </div>
+  </ng-template>
+</p-card>

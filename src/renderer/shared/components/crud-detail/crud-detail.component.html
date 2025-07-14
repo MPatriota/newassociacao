@@ -1,0 +1,104 @@
+<p-table [value]="formArray.value"
+         editMode="row"
+         dataKey="rowId"
+         [editingRowKeys]="editingRowKeys"
+         stripedRows>
+  <ng-template #header>
+    <tr>
+
+      @for (column of columns; track column.field) {
+        <th>{{column.header}}</th>
+      }
+
+      <th style="width: 10%">
+        <div class="flex justify-content-end">
+          <p-button (onClick)="addChild()" icon="pi pi-plus" size="small" [rounded]="true" severity="success"/>
+        </div>
+      </th>
+    </tr>
+  </ng-template>
+
+  <ng-template #body let-product let-editing="editing" let-ri="rowIndex">
+    <tr [pEditableRow]="product">
+      @for (column of columns; track column.field) {
+        @if (column.field) {
+          <td>
+            <p-cellEditor>
+              <ng-template #input>
+                @if (column.inputTemplate) {
+                  <ng-container
+                    [ngTemplateOutlet]="column.inputTemplate"
+                    [ngTemplateOutletContext]="{ $implicit: product }">
+                  </ng-container>
+                } @else {
+                  <input
+                    pInputText
+                    type="text"
+                    [(ngModel)]="product[column.field]" [ngModelOptions]="{standalone: true}"
+                    [pAutoFocus]="editing"
+                    formValidateMessage/>
+                }
+              </ng-template>
+
+              <ng-template #output>
+                @if (column.outputTemplate) {
+                    <ng-container
+                      [ngTemplateOutlet]="column.outputTemplate"
+                      [ngTemplateOutletContext]="{ $implicit: product }">
+                    </ng-container>
+                } @else {
+                  {{product[column.field]}}
+                }
+              </ng-template>
+            </p-cellEditor>
+          </td>
+        }
+      }
+      <td>
+        <div class="flex justify-content-end gap-2">
+          <button
+            *ngIf="!editing"
+            pButton
+            type="button"
+            pInitEditableRow
+            icon="pi pi-pencil"
+            text
+            rounded
+            severity="secondary"
+          ></button>
+          <button
+            *ngIf="!editing"
+            pButton
+            type="button"
+            icon="pi pi-trash"
+            (click)="deleteChild(ri)"
+            text
+            rounded
+            severity="danger"
+          ></button>
+          <button
+            *ngIf="editing"
+            pButton
+            type="button"
+            pSaveEditableRow
+            (click)="saveChild(product, ri)"
+            icon="pi pi-check"
+            text
+            rounded
+            severity="secondary"
+          ></button>
+          <button
+            *ngIf="editing"
+            pButton
+            type="button"
+            pCancelEditableRow
+            icon="pi pi-times"
+            text
+            rounded
+            severity="secondary"
+          ></button>
+        </div>
+      </td>
+    </tr>
+  </ng-template>
+</p-table>
