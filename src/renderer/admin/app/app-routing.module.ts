@@ -66,7 +66,13 @@ const routes: Routes = [
   {
     path: '**',
     redirectTo: 'home'
+  },
+  
+  {
+    path: 'relatorios',
+    loadChildren: () => import('./pages/relatorios/relatorios.module').then(m => m.RelatoriosModule)
   }
+
 ];
 
 @NgModule({

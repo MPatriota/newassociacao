@@ -1,0 +1,26 @@
+<h2>{{ titulo }}</h2>
+
+<div class="filtros">
+  <label>Data Início:
+    <input type="date" [(ngModel)]="dataInicio">
+  </label>
+  <label>Data Fim:
+    <input type="date" [(ngModel)]="dataFim">
+  </label>
+  <button (click)="buscar()">Buscar</button>
+</div>
+
+<table *ngIf="resultados.length">
+  <thead>
+    <tr>
+      <th>Condição de Pagamento</th>
+      <th>Total</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let item of resultados">
+      <td>{{ item.condicaoPagamento }}</td>
+      <td>{{ item.total | currency:'BRL' }}</td>
+    </tr>
+  </tbody>
+</table>

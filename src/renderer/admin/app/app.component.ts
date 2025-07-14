@@ -116,6 +116,12 @@ export class AppComponent implements OnInit {
           }
         ]
       },
+      {
+        label: 'Relatórios',
+        icon: 'pi pi-chart-bar',
+        routerLink: '/relatorios'
+      }
+
 
     ];
   }
