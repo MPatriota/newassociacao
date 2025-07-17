@@ -238,9 +238,13 @@ export class Table {
     }, 0)
   }
 
-  get valorRestante() {
-    return this.total - this.totalPago;
-  }
+get valorRestante() {
+  const valor = this.total - this.totalPago;
+
+  // Corrige problemas de precisão que geram -0.00 ou valores residuais como 0.00000001
+  return Math.max(0, Number(valor.toFixed(2)));
+}
+
 
   get temCondicaoPagamentoZerada() {
     return this._condicoesPagamento.some(condicaoPagamentoVenda => condicaoPagamentoVenda.valor == 0);
